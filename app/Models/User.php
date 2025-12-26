@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->morphMany('App\Models\SaveHistory', 'content');
     }
 
+    public function point_history()
+    {
+        return $this->hasMany('App\Models\PointHistory','agent_id')->orderBy('created_at', 'desc');
+    }
+
     public function downlines()
     {
         return $this->hasMany('App\Models\User', 'upline', 'id');

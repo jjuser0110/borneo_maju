@@ -21,51 +21,7 @@
                 <!-- /Search -->
 
                 <ul class="navbar-nav flex-row align-items-center ms-auto">
-                  <!-- Language -->
-                  <!-- <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
-                    <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                      <i class="bx bx-globe bx-sm"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                      <li>
-                        <a
-                          class="dropdown-item"
-                          href="javascript:void(0);"
-                          data-language="en"
-                          data-text-direction="ltr">
-                          <span class="align-middle">English</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          class="dropdown-item"
-                          href="javascript:void(0);"
-                          data-language="fr"
-                          data-text-direction="ltr">
-                          <span class="align-middle">French</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          class="dropdown-item"
-                          href="javascript:void(0);"
-                          data-language="ar"
-                          data-text-direction="rtl">
-                          <span class="align-middle">Arabic</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          class="dropdown-item"
-                          href="javascript:void(0);"
-                          data-language="de"
-                          data-text-direction="ltr">
-                          <span class="align-middle">German</span>
-                        </a>
-                      </li>
-                    </ul>
-                  </li> -->
-                  <!--/ Language -->
+                  
 
                   <!-- Style Switcher -->
                   <!-- <li class="nav-item dropdown-style-switcher dropdown me-2 me-xl-0">
@@ -427,6 +383,28 @@
                     </ul>
                   </li> -->
                   <!--/ Notification -->
+                  <span class="btn btn-primary" style="margin-left:5px">
+                      Bal : {{number_format(Auth::user()->point,2)}}
+                  </span>
+
+                  <!-- Language -->
+                  <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
+                    <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                      <i class="bx bx-globe bx-sm"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          href="javascript:void(0);"
+                          data-language="en"
+                          data-text-direction="ltr">
+                          <span class="align-middle">English</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+                  <!--/ Language -->
 
                   <!-- User -->
                   <li class="nav-item navbar-dropdown dropdown-user dropdown">
@@ -453,6 +431,12 @@
                       </li>
                       <li>
                         <div class="dropdown-divider"></div>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" style="cursor:pointer" href="{{route('my_point_logs')}}">
+                          <i class="bx bx-user me-2"></i>
+                          <span class="align-middle">My Point Logs</span>
+                        </a>
                       </li>
                       <li>
                         <a class="dropdown-item" style="cursor:pointer" data-bs-toggle="modal"

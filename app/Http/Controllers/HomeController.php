@@ -36,6 +36,11 @@ class HomeController extends Controller
         return view('home');
     }
 
+    public function my_point_logs(Request $request)
+    {
+        return view('my_point_log');
+    }
+
     public function change_password(Request $request){
         $user = Auth::user();
 

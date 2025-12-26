@@ -32,7 +32,15 @@ $currentRoute = request()->route()->getName();
             </a>
         </li>
         @endif
-
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text" data-i18n="Orders">Pendings</span>
+        </li>
+        <li class="menu-item {{ Str::contains($currentRoute, 'order.pending') ? 'active' : ''}}">
+            <a href="{{ route('order.pending') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user-circle"></i>
+                <div>Pending Orders</div>
+            </a>
+        </li>
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text" data-i18n="Orders">Orders</span>
         </li>

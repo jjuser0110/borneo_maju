@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\PointHistory;
 use Bouncer;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -26,6 +27,21 @@ class OrderController extends Controller
         }
 
         return view('order.index')->with('order',$order);
+    }
+
+    public function pending(Request $request)
+    {
+        $loginUser = Auth::user();
+        $order = Order::where('status', "pending")->get();
+
+        return view('order.pending')->with('order',$order);
+    }
+
+    public function view(Request $request, Order $order)
+    {
+        $loginUser = Auth::user();
+
+        return view('order.view')->with('order',$order);
     }
 
     public function create()
@@ -67,6 +83,7 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $loginUser = Auth::user();
         $total_amount = round($request->myr_amount + $request->processing_fees, 2);
         $request->merge(['user_id' => $loginUser->id, 'total_amount' => $total_amount]);
@@ -76,6 +93,17 @@ class OrderController extends Controller
             ->where('month', $request->month)
             ->first();
         $check->increment('running_no');
+
+        $point_before = $loginUser->point;
+        $point_after = round($loginUser->point - $request->myr_amount, 2);
+        PointHistory::create([
+            'agent_id' => $loginUser->id,
+            'point_before' => $point_before,
+            'point' => $request->myr_amount,
+            'point_after' => $point_after,
+            'description' => 'Order '.$order->order_no
+        ]);
+        $loginUser->update(['point'=>$point_after]);
 
         return redirect()->route('order.index')->withSuccess('Data saved');
     }
