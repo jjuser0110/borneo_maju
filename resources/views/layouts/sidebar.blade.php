@@ -5,7 +5,7 @@ $currentRoute = request()->route()->getName();
 @endphp
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
-        <a href="{{ route('home') }}" class="app-brand-link">
+        <a href="#" class="app-brand-link">
             <span class="app-brand-logo demo">
                 <img src="{{ asset('smalllogo.png') }}" alt="Logo" style="width:100%;" />
             </span>
@@ -32,6 +32,7 @@ $currentRoute = request()->route()->getName();
             </a>
         </li>
         @endif
+        @if(Auth::user()->role_id != 3)
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text" data-i18n="Orders">Pendings</span>
         </li>
@@ -41,6 +42,9 @@ $currentRoute = request()->route()->getName();
                 <div>Pending Orders</div>
             </a>
         </li>
+        @endif
+        
+        @if(Auth::user()->role_id != 2)
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text" data-i18n="Orders">Orders</span>
         </li>
@@ -59,7 +63,7 @@ $currentRoute = request()->route()->getName();
                 <div>Agents</div>
             </a>
         </li>
-
+        @endif
         @if(Auth::user()->role_id == 1)
             @php
                 $userRoutes = ['admin', 'staff'];

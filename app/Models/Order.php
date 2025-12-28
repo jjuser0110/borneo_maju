@@ -44,6 +44,21 @@ class Order extends Model
     {
         return $this->belongsTo('App\Models\User', 'status_by_id');
     }
+
+    public function file_attachments()
+    {
+        return $this->morphMany('App\Models\FileAttachment', 'content');
+    }
+
+    public function details()
+    {
+        return $this->hasMany('App\Models\OrderDetail', 'order_id');
+    }
+
+    public function last_image()
+    {
+        return $this->morphOne('App\Models\FileAttachment', 'content')->latest();
+    }
     
 }
 

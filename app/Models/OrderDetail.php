@@ -19,6 +19,9 @@ class OrderDetail extends Model
         'idr_amount',
         'processing_fees',
         'total_amount',
+        'upline',
+        'do_up',
+        'profit',
     ];
 
     public function order()

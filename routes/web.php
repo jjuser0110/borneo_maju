@@ -22,3 +22,4 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::post('/change_password', [App\Http\Controllers\HomeController::class, 'change_password'])->name('change_password');
 Route::get('/my_point_logs', [App\Http\Controllers\HomeController::class, 'my_point_logs'])->name('my_point_logs');
+Route::get('/removeimage/{image_id}', 'HomeController@removeimage')->name('removeimage');

@@ -3,22 +3,22 @@
     <!-- Content -->
 
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 breadcrumb-wrapper mb-4"><span class="text-muted fw-light">Order </span></h4>
+        <h4 class="py-3 breadcrumb-wrapper mb-4"><span class="text-muted fw-light">Pending Order </span></h4>
 
         <!-- DataTable with Buttons -->
         <div class="card">
             <div class="card-header flex-column flex-md-row">
                 <div class="head-label">
-                    <h5 class="card-title mb-0">Order Listing</h5>
+                    <h5 class="card-title mb-0">Pending Order Listing</h5>
                 </div>
                 <div class="dt-action-buttons text-end pt-3 pt-md-0">
-                    <div class="dt-buttons"> 
+                    <!-- <div class="dt-buttons"> 
                         <a class="dt-button create-new btn btn-primary" type="button" href="{{route('order.create')}}" onclick="showLoading()">
                             <span><i class="bx bx-plus me-sm-1"></i> 
                                 <span class="d-none d-sm-inline-block">Add New Record</span>
                             </span>
                         </a> 
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="card-datatable text-nowrap">

@@ -119,10 +119,11 @@
                     />
                 </div>
                 <hr>
-                <div class="col-12">
+                <div class="col-12" style="text-align:right">
                     <button type="submit" name="submitButton" class="btn btn-primary">Submit</button>
                 </div>
                 </form>
+                
             </div>
             </div>
         </div>
@@ -179,6 +180,16 @@
         isUpdating = true;
         idrInput.value = round(myr * rate, 2);
         isUpdating = false;
+    });
+
+    $(function(){
+        var table = $('#mytable').DataTable({
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+            pageLength: 10,
+            displayLength: 5,
+            ordering:false,
+            lengthMenu: [5, 10, 25, 50, 75, 100],
+        });
     });
 </script>
 @endsection

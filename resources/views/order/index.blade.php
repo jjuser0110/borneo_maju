@@ -27,6 +27,7 @@
                         <tr>
                             <th>No</th>
                             <th>Order No</th>
+                            <th>User</th>
                             <th>Order Date</th>
                             <th>Bank</th>
                             <th>Account No</th>
@@ -45,6 +46,7 @@
                         <tr>
                             <td>{{$index + 1}}</td>
                             <td>{{$row->order_no??""}}</td>
+                            <td>{{$row->user->username??""}}</td>
                             <td>{{$row->order_datetime??""}}</td>
                             <td>{{$row->bank->bank_name??""}}</td>
                             <td>{{$row->account_no??""}}</td>
@@ -56,9 +58,12 @@
                             <td>{{$row->total_amount??""}}</td>
                             <td>{{$row->status??""}}</td>
                             <td>
+                                <a href="{{ route('order.view_details',$row) }}" onclick="showLoading()"><i class="fa-solid fa-eye"></i></a>
+                                @if($row->status == 'pending')
                                 <a href="{{ route('order.edit',$row) }}" onclick="showLoading()"><i class="fa-solid fa-pen-to-square"></i></a>
                                 <a style="color:red;cursor:pointer" onclick="if(confirm('Are you sure you want to delete?')){showLoading();window.location.href='{{ route('order.destroy',$row) }}'}"><i class="fa-solid fa-trash"></i></a>
                                 <div class="btn-group">
+                                @endif
                             </td>
                         </tr>
                         @endforeach
