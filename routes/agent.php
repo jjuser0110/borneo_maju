@@ -9,6 +9,7 @@ Route::prefix('/agent')->as('agent.')->middleware(['auth'])->group(function() {
     Route::post('/store', 'AgentController@store')->name('store');
     Route::get('/edit/{agent}', 'AgentController@edit')->name('edit');
     Route::get('/downline/{agent}', 'AgentController@downline')->name('downline');
+    Route::get('/viewlog/{agent}', 'AgentController@viewlog')->name('viewlog');
     Route::post('/update/{agent}', 'AgentController@update')->name('update');
     Route::get('/destroy/{agent}', 'AgentController@destroy')->name('destroy');
 });

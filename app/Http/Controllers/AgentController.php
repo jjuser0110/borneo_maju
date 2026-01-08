@@ -94,6 +94,11 @@ class AgentController extends Controller
         return view('agent.downline')->with('agent',$agent);
     }
 
+    public function viewlog(User $agent)
+    {
+        return view('agent.viewlog')->with('agent',$agent);
+    }
+
     public function update(Request $request, User $agent)
     {
         if($request->password !=null){

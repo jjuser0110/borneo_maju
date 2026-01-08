@@ -383,9 +383,9 @@
                     </ul>
                   </li> -->
                   <!--/ Notification -->
-                  <span class="btn btn-primary" style="margin-left:5px">
+                  <a class="btn btn-primary" style="margin-left:5px" href="{{route('my_point_logs')}}" onclick="showLoading()">
                       Bal : {{number_format(Auth::user()->point,2)}}
-                  </span>
+                  </a>
 
                   <!-- Language -->
                   <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
@@ -396,10 +396,18 @@
                       <li>
                         <a
                           class="dropdown-item"
-                          href="javascript:void(0);"
-                          data-language="en"
-                          data-text-direction="ltr">
+                          onclick="change_language('en')" style="cursor:pointer">
                           <span class="align-middle">English</span>
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          onclick="change_language('cn')" style="cursor:pointer">
+                          <span class="align-middle">Chinese</span>
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          onclick="change_language('bm')" style="cursor:pointer">
+                          <span class="align-middle">Bahasa Melayu</span>
                         </a>
                       </li>
                     </ul>
@@ -475,3 +483,20 @@
             </div>
           </nav>
     </div>
+
+    <script>
+
+    function change_language(x){
+      showLoading();
+        $.ajax({
+            data: {language:x},
+            url: "{{route('change_language')}}",
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+            success: function(response){
+                location.reload();
+
+            }
+        });
+    }
+    </script>

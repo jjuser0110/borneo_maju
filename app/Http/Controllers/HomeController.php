@@ -26,6 +26,18 @@ class HomeController extends Controller
         $this->middleware('auth');
     }
 
+    public function change_language(Request $request)
+    {
+        $request->validate([
+            'language' => 'required|in:en,bm,cn',
+        ]);
+        // dd($request->all());
+        app()->setLocale($request->language);
+        session(['locale' => $request->language]);
+
+        // dd(session('locale'));
+        return redirect()->back();
+    }
 
     public function index(Request $request)
     {

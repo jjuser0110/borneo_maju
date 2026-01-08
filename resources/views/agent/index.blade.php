@@ -48,6 +48,7 @@
                             <td>{{$row->processing_fees??""}}</td>
                             <td><?php echo isset($row)&&$row->is_active == 1?'<span style="color:green">Active</span>':'<span style="color:red">Inactive</span>'?></td>
                             <td>
+                                <a href="{{route('agent.viewlog',$row)}}" onclick="showLoading()"><i class="fa-solid fa-clock-rotate-left"></i></a>
                                 <a href="{{ route('agent.edit',$row) }}" onclick="showLoading()"><i class="fa-solid fa-pen-to-square"></i></a>
                             </td>
                         </tr>

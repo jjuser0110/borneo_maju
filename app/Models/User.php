@@ -72,4 +72,9 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\User', 'upline', 'id');
     }
+
+    public function order_details()
+    {
+        return $this->hasMany('App\Models\OrderDetail');
+    }
 }

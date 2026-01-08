@@ -26,9 +26,9 @@ $currentRoute = request()->route()->getName();
         <!-- Dashboards -->
         @if(Auth::user()->role_id == 1)
         <li class="menu-item {{ Str::contains($currentRoute, 'home') ? 'active' : ''}}">
-            <a href="{{ route('home') }}" class="menu-link">
+            <a href="{{ route('home') }}" class="menu-link" onclick="showLoading()">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div>Dashboards</div>
+                <div>{{ __('sidebar.dashboard') }}</div>
             </a>
         </li>
         @endif
@@ -37,7 +37,7 @@ $currentRoute = request()->route()->getName();
             <span class="menu-header-text" data-i18n="Orders">Pendings</span>
         </li>
         <li class="menu-item {{ Str::contains($currentRoute, 'order.pending') ? 'active' : ''}}">
-            <a href="{{ route('order.pending') }}" class="menu-link">
+            <a href="{{ route('order.pending') }}" class="menu-link" onclick="showLoading()">
                 <i class="menu-icon tf-icons bx bx-user-circle"></i>
                 <div>Pending Orders</div>
             </a>
@@ -48,8 +48,14 @@ $currentRoute = request()->route()->getName();
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text" data-i18n="Orders">Orders</span>
         </li>
+        <li class="menu-item {{ Str::contains($currentRoute, 'report.sales_report') ? 'active' : ''}}">
+            <a href="{{ route('report.sales_report') }}" class="menu-link" onclick="showLoading()">
+                <i class="menu-icon tf-icons bx bx-user-circle"></i>
+                <div>Sales Report</div>
+            </a>
+        </li>
         <li class="menu-item {{ Str::contains($currentRoute, 'order.index') ? 'active' : ''}}">
-            <a href="{{ route('order.index') }}" class="menu-link">
+            <a href="{{ route('order.index') }}" class="menu-link" onclick="showLoading()">
                 <i class="menu-icon tf-icons bx bx-user-circle"></i>
                 <div>Orders</div>
             </a>
@@ -58,7 +64,7 @@ $currentRoute = request()->route()->getName();
             <span class="menu-header-text" data-i18n="Settings">Settings</span>
         </li>
         <li class="menu-item {{ Str::contains($currentRoute, 'agent.index') ? 'active' : ''}}">
-            <a href="{{ route('agent.index') }}" class="menu-link">
+            <a href="{{ route('agent.index') }}" class="menu-link" onclick="showLoading()">
                 <i class="menu-icon tf-icons bx bx-user-circle"></i>
                 <div>Agents</div>
             </a>
@@ -81,7 +87,7 @@ $currentRoute = request()->route()->getName();
                 <ul class="menu-sub">
                     @foreach ($userRoutes as $role)
                         <li class="menu-item {{ Str::contains($currentRoute, $role) ? 'active' : '' }}">
-                            <a href="{{ route($role . '.index') }}" class="menu-link">
+                            <a href="{{ route($role . '.index') }}" class="menu-link" onclick="showLoading()">
                                 <div>{{ ucfirst($role) }}</div>
                             </a>
                         </li>
@@ -90,7 +96,7 @@ $currentRoute = request()->route()->getName();
             </li>
             @endif
             <li class="menu-item {{ Str::contains($currentRoute, 'bank.index') ? 'active' : ''}}">
-                <a href="{{ route('bank.index') }}" class="menu-link">
+                <a href="{{ route('bank.index') }}" class="menu-link" onclick="showLoading()">
                     <i class="menu-icon tf-icons bx bx-user-circle"></i>
                     <div>Banks</div>
                 </a>
