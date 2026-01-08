@@ -3,47 +3,65 @@
     <!-- Content -->
 
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 breadcrumb-wrapper mb-4"><span class="text-muted fw-light">Admin </span></h4>
+        <h4 class="py-3 breadcrumb-wrapper mb-4">
+            <span class="text-muted fw-light">{{ __('sidebar.admin') }}</span>
+        </h4>
 
         <!-- DataTable with Buttons -->
         <div class="card">
             <div class="card-header flex-column flex-md-row">
                 <div class="head-label">
-                    <h5 class="card-title mb-0">Admin Listing</h5>
+                    <h5 class="card-title mb-0">{{ __('sidebar.admin_listing') }}</h5>
                 </div>
                 <div class="dt-action-buttons text-end pt-3 pt-md-0">
                     <div class="dt-buttons"> 
-                        <a class="dt-button create-new btn btn-primary" type="button" href="{{route('admin.create')}}" onclick="showLoading()">
-                            <span><i class="bx bx-plus me-sm-1"></i> 
-                                <span class="d-none d-sm-inline-block">Add New Record</span>
+                        <a class="dt-button create-new btn btn-primary"
+                           type="button"
+                           href="{{ route('admin.create') }}"
+                           onclick="showLoading()">
+                            <span>
+                                <i class="bx bx-plus me-sm-1"></i> 
+                                <span class="d-none d-sm-inline-block">
+                                    {{ __('sidebar.add_new_record') }}
+                                </span>
                             </span>
                         </a> 
                     </div>
                 </div>
             </div>
+
             <div class="card-datatable text-nowrap">
                 <table class="dt-column-search table table-bordered" id="mytable">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Username</th>
-                            <th>Name</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th>{{ __('sidebar.no') }}</th>
+                            <th>{{ __('sidebar.username') }}</th>
+                            <th>{{ __('sidebar.name') }}</th>
+                            <th>{{ __('sidebar.role') }}</th>
+                            <th>{{ __('sidebar.status') }}</th>
+                            <th>{{ __('sidebar.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($admin as $index=> $row)
+                        @foreach($admin as $index => $row)
                         <tr>
-                            <td>{{$index+1}}</td>
-                            <td>{{$row->username??""}}</td>
-                            <td>{{$row->name??""}}</td>
-                            <td>{{$row->role->title??""}}</td>
-                            <td><?php echo isset($row)&&$row->is_active == 1?'<span style="color:green">Active</span>':'<span style="color:red">Inactive</span>'?></td>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $row->username ?? "" }}</td>
+                            <td>{{ $row->name ?? "" }}</td>
+                            <td>{{ $row->role->title ?? "" }}</td>
                             <td>
-                                <a href="{{ route('admin.edit',$row) }}" onclick="showLoading()"><i class="fa-solid fa-pen-to-square"></i></a>
-                                <a style="color:red;cursor:pointer" onclick="if(confirm('Are you sure you want to delete?')){showLoading();window.location.href='{{ route('admin.destroy',$row) }}'}"><i class="fa-solid fa-trash"></i></a>
+                                {!! isset($row) && $row->is_active == 1 
+                                    ? '<span style="color:green">' . __('sidebar.active') . '</span>'
+                                    : '<span style="color:red">' . __('sidebar.inactive') . '</span>' !!}
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.edit', $row) }}" onclick="showLoading()">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a style="color:red;cursor:pointer"
+                                   onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){showLoading();window.location.href='{{ route('admin.destroy',$row) }}'}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
                             </td>
                         </tr>
                         @endforeach
@@ -53,20 +71,20 @@
         </div>
     </div>
     <!-- / Content -->
+@endsection
 
+@section('page-js')
+@endsection
 
-    @endsection
-    @section('page-js')
-    @endsection
-    @section('scripts')
-      <script>
-    $(function(){
-      var table = $('#mytable').DataTable({
+@section('scripts')
+<script>
+$(function(){
+    var table = $('#mytable').DataTable({
         responsive: true,
         pageLength: 10,
         displayLength: 7,
         lengthMenu: [7, 10, 25, 50, 75, 100],
-      });
     });
-  </script>
-    @endsection
+});
+</script>
+@endsection

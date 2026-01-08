@@ -22,14 +22,26 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
+        $date_from = $request->date_from
+            ? Carbon::parse($request->date_from)->startOfDay()
+            : Carbon::now()->startOfDay();
+
+        $date_to = $request->date_to
+            ? Carbon::parse($request->date_to)->endOfDay()
+            : Carbon::now()->endOfDay();
+
         $loginUser = Auth::user();
         if($loginUser->role_id!=3){
-            $order = Order::all();
+            $order = Order::whereBetween('order_datetime', [$date_from, $date_to])->get();
         }else{
-            $order = Order::where('user_id', $loginUser->id)->get();
+            $order = Order::where('user_id', $loginUser->id)->whereBetween('order_datetime', [$date_from, $date_to])->get();
         }
 
-        return view('order.index')->with('order',$order);
+        return view('order.index', [
+            'order'    => $order,
+            'date_from' => $date_from->format('Y-m-d'),
+            'date_to'   => $date_to->format('Y-m-d'),
+        ]);
     }
 
     public function pending(Request $request)

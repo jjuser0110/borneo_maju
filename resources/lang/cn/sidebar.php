@@ -1,0 +1,144 @@
+<?php
+
+return [
+    'dashboard'        => '仪表板',
+
+    'pendings'         => '待处理',
+    'pending_orders'   => '待处理订单',
+
+    'orders_section'   => '订单',
+    'sales_report'     => '销售报告',
+    'orders'           => '订单',
+    'order_listing'    => '订单列表',
+    'order_details'    => '订单详情',
+
+    'settings'         => '设置',
+    'agents'           => '代理',
+
+    'users'            => '用户',
+    'admin'            => '管理员',
+    'staff'            => '员工',
+    'agent'            => '代理',
+
+    'banks'            => '银行',
+    'bank_listing'     => '银行列表',
+    'bank_details'     => '银行详情',
+
+    'balance'          => '余额',
+    'english'          => '英语',
+    'chinese'          => '中文',
+    'bahasa_melayu'    => '马来语',
+
+    'my_point_logs'    => '我的积分记录',
+    'change_password'  => '修改密码',
+    'logout'           => '登出',
+    'search'           => '搜索...',
+
+    'password'          => '密码',
+    'password_placeholder' => '请输入密码',
+    'confirm_password'  => '确认密码',
+    'close'             => '关闭',
+    'save_changes'      => '保存更改',
+
+    'bank'             => '银行',
+    'add_new_record'   => '新增记录',
+    'bank_name'        => '银行名称',
+    'bank_name_placeholder' => '例如: 中国银行',
+    'short_name'       => '简称',
+    'short_name_placeholder' => '例如: BOC',
+
+    'actions'          => '操作',
+    'confirm_delete'   => '您确定要删除吗？',
+
+    'create'           => '创建',
+    'edit'             => '编辑',
+    'submit'           => '提交',
+
+    'admin_listing'    => '管理员列表',
+    'admin_details'    => '管理员详情',
+    'admin_name'       => '管理员姓名',
+    'admin_name_placeholder' => '请输入管理员姓名',
+    'admin_username'   => '管理员用户名',
+    'admin_username_placeholder' => '请输入用户名',
+
+    'staff_listing'    => '员工列表',
+    'staff_details'    => '员工详情',
+    'staff_name'       => '员工姓名',
+    'staff_name_placeholder' => '请输入员工姓名',
+    'staff_username'   => '员工用户名',
+    'staff_username_placeholder' => '请输入用户名',
+
+    'agent_listing'    => '代理列表',
+    'agent_details'    => '代理详情',
+    'agent_name'       => '代理姓名',
+    'agent_name_placeholder' => '请输入代理姓名',
+    'agent_username'   => '代理用户名',
+    'agent_username_placeholder' => '请输入用户名',
+
+    'username'         => '用户名',
+    'name'             => '姓名',
+    'role'             => '角色',
+    'status'           => '状态',
+    'active'           => '激活',
+    'inactive'         => '未激活',
+    'point'            => '积分',
+    'points'           => '积分',
+    'balance'          => '余额',
+    'idr_rate'         => '印尼盾汇率',
+    'rate'             => '汇率',
+    'processing_fees'  => '手续费',
+    'fees'             => '费用',
+
+    'downline_list'    => '下线列表',
+    'point_logs'       => '积分记录',
+
+    'description'      => '描述',
+    'before'           => '之前',
+    'after'            => '之后',
+    'created_at'       => '创建时间',
+
+    'my_downlines'     => '我的下线',
+    'to'               => '至',
+    'filter'           => '筛选',
+
+    'total_order'      => '总订单',
+    'total_idr'        => '总印尼盾',
+    'total_myr'        => '总马币',
+    'total_processing_fees' => '总手续费',
+    'total_do_up'      => '总加价(MYR)',
+    'total_profit'     => '总利润',
+    'total'            => '总计',
+
+    'order_no'         => '订单号',
+    'user'             => '用户',
+    'order_date'       => '订单日期',
+    'order_full_date'  => '完整订单日期',
+    'bank_info'        => '银行信息',
+    'account_no'       => '账号',
+    'fullname'         => '全名',
+    'myr_amount'       => '马币金额',
+    'idr_amount'       => '印尼盾金额',
+    'total_amount'     => '总金额',
+    'do_up'            => '加价(MYR)',
+    'profit'           => '利润',
+    'receipt'          => '收据',
+
+    'pending_order'          => '待处理订单',
+    'pending_order_listing'  => '待处理订单列表',
+    'handle'                 => '处理',
+    'details'                => '详情',
+    'work'                   => '工作',
+    'status_at'              => '状态时间',
+    'status_by'              => '状态操作人',
+    'remarks'                => '备注',
+    'update_order'           => '更新订单',
+
+    'pending'     => '待处理',
+    'processing'  => '处理中',
+    'completed'   => '已完成',
+    'cancelled'   => '已取消',
+
+    'orders_count' => '订单数量',
+
+    'no'          => '序号',
+];

@@ -28,10 +28,10 @@ class HomeController extends Controller
 
     public function change_language(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'language' => 'required|in:en,bm,cn',
         ]);
-        // dd($request->all());
         app()->setLocale($request->language);
         session(['locale' => $request->language]);
 
