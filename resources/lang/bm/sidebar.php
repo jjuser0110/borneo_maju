@@ -11,6 +11,7 @@ return [
     'orders'           => 'Pesanan',
     'order_listing'    => 'Senarai Pesanan',
     'order_details'    => 'Butiran Pesanan',
+    'my_orders'        => 'Pesanan Saya',
 
     'settings'         => 'Tetapan',
     'agents'           => 'Ejen',
@@ -108,6 +109,8 @@ return [
     'total_do_up'      => 'Jumlah Do Up (MYR)',
     'total_profit'     => 'Jumlah Untung',
     'total'            => 'Jumlah',
+    'total_collected'  => 'Jumlah Kutipan',
+    'downline_pay'     => 'Bayaran Downline',
 
     'order_no'         => 'No. Pesanan',
     'user'             => 'Pengguna',

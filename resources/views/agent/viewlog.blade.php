@@ -55,10 +55,11 @@
 <script>
 $(function(){
   var table = $('#mytable').DataTable({
-    responsive: true,
+    dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
     pageLength: 10,
-    displayLength: 7,
-    lengthMenu: [7, 10, 25, 50, 75, 100],
+    displayLength: 5,
+    ordering:false,
+    lengthMenu: [5, 10, 25, 50, 75, 100],
   });
 });
 </script>

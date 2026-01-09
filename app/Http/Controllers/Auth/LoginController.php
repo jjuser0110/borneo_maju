@@ -59,6 +59,8 @@ class LoginController extends Controller
         }else{
             if($user->role_id == 2){
                 return redirect()->route('order.pending')->withSuccess('Successfully Login');
+            }else if($user->role_id == 3){
+                return redirect()->route('report.sales_report')->withSuccess('Successfully Login');
             }else{
                 return redirect()->route('home')->withSuccess('Successfully Login');
             }

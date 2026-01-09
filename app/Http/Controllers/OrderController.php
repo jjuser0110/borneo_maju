@@ -197,7 +197,7 @@ class OrderController extends Controller
                 $totalAmount = round($myrAmount + $currentUser->processing_fees, 2);
                 $profit = round($orderTotal - $totalAmount, 2);
 
-                OrderDetail::create([
+                $order_details = OrderDetail::create([
                     'order_id'         => $order->id,
                     'user_id'          => $currentUser->id,
                     'idr_amount'       => $idrAmount,
@@ -215,6 +215,14 @@ class OrderController extends Controller
                 $currentUser = $currentUser->upline
                     ? User::find($currentUser->upline)
                     : null;
+
+                if($currentUser && $currentUser->role_id != 1){
+                    $myrAmount2 = round($idrAmount / $currentUser->idr_rate, 2);
+                    $totalAmount2 = round($myrAmount2 + $currentUser->processing_fees, 2);
+                    $order_details->update([
+                        'agent_do_up' => $totalAmount2,
+                    ]);
+                }
             }
         });
 

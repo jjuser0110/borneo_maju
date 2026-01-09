@@ -3,7 +3,7 @@ $currentRoute = request()->route()->getName();
 @endphp
 
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-    <div class="app-brand demo">
+    <div class="app-brand demo" style="padding-top:10px;padding-bottom:10px">
         <a href="#" class="app-brand-link">
             <span class="app-brand-logo demo">
                 <img src="{{ asset('smalllogo.png') }}" alt="Logo" style="width:100%;" />

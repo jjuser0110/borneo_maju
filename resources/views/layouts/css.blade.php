@@ -58,4 +58,34 @@
     z-index: 999997;
     width: 100%;
   }
+
+  .table {
+      font-size: 12px;
+  }
+
+  .table th,
+  .table td {
+      padding: 4px 6px;
+  }
+
+  /* Header */
+  .table thead th {
+      background-color: #f0ed54ff !important;
+  }
+
+  /* Body zebra stripes */
+  .table tbody tr:nth-child(odd) {
+      background-color: #ffffffff;
+  }
+
+  .table tbody tr:nth-child(even) {
+      background-color: #e4e4e4ff;
+  }
+
+  /* Footer */
+  .table tfoot th,
+  .table tfoot td {
+      background-color: #f0ed54ff !important;
+  }
+
 </style>

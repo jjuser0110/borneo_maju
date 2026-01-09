@@ -11,6 +11,7 @@ return [
     'orders'           => '订单',
     'order_listing'    => '订单列表',
     'order_details'    => '订单详情',
+    'my_orders'        => '我的订单',
 
     'settings'         => '设置',
     'agents'           => '代理',
@@ -108,6 +109,8 @@ return [
     'total_do_up'      => '总加价(MYR)',
     'total_profit'     => '总利润',
     'total'            => '总计',
+    'total_collected'  => '总收款',
+    'downline_pay'     => '下线支付',
 
     'order_no'         => '订单号',
     'user'             => '用户',

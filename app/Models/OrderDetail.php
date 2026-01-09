@@ -22,6 +22,7 @@ class OrderDetail extends Model
         'upline',
         'do_up',
         'profit',
+        'agent_do_up',
     ];
 
     public function order()

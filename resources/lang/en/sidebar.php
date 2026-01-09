@@ -11,6 +11,7 @@ return [
     'orders'           => 'Orders',
     'order_listing'    => 'Order Listing',
     'order_details'    => 'Order Details',
+    'my_orders'        => 'My Orders',
 
     'settings'         => 'Settings',
     'agents'           => 'Agents',
@@ -108,6 +109,8 @@ return [
     'total_do_up'      => 'Total Do Up',
     'total_profit'     => 'Total Profit',
     'total'            => 'Total',
+    'total_collected'  => 'Total Collected',
+    'downline_pay'    => 'Downline Pay',
 
     'order_no'         => 'Order No',
     'user'             => 'User',

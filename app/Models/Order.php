@@ -59,6 +59,15 @@ class Order extends Model
     {
         return $this->morphOne('App\Models\FileAttachment', 'content')->latest();
     }
+
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class)
+            ->whereColumn('order_details.user_id', 'orders.user_id');
+    }
+
+
+
     
 }
 
