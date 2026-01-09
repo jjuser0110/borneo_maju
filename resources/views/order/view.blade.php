@@ -196,4 +196,16 @@
 @section('page-js')
 @endsection
 @section('scripts')
+<script>
+$(function(){
+  var table = $('#mytable').DataTable({
+    dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+    paging: false,      // disable pagination
+    searching: false,   // disable search/filter
+    ordering: false,    // disable column sorting
+    info: false,        // hide "Showing X of Y entries"
+    lengthChange: false
+  });
+});
+</script>
 @endsection
