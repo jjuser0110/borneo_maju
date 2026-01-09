@@ -101,4 +101,9 @@ class HomeController extends Controller
         }
         return redirect()->back()->withErrors('Image not found');
     }
+
+    public function get_pending(){
+        $pending_count = Order::where('status','pending')->count();
+        return response()->json(['pending_count' => $pending_count]);
+    }
 }

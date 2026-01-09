@@ -56,6 +56,7 @@ class OrderController extends Controller
     public function view(Request $request, Order $order)
     {
         $loginUser = Auth::user();
+        $order->update(['status'=>'processing']);
 
         return view('order.view')->with('order',$order);
     }
@@ -143,6 +144,9 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order)
     {
+        if($order->status != 'pending'){
+            return redirect()->route('order.index')->withError('Only pending order can be updated');
+        }
         $total_amount = round($request->myr_amount + $request->processing_fees, 2);
         $request->merge(['total_amount' => $total_amount]);
         $order->update($request->all());
@@ -151,7 +155,11 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
-        $order->delete();
+        if($order->status == 'pending'){
+            $order->delete();
+        }else{
+            return redirect()->route('order.index')->withError('Only pending order can be deleted');
+        }
 
         return redirect()->route('order.index')->withSuccess('Data deleted');
     }

@@ -23,4 +23,5 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::post('/change_password', [App\Http\Controllers\HomeController::class, 'change_password'])->name('change_password');
 Route::get('/my_point_logs', [App\Http\Controllers\HomeController::class, 'my_point_logs'])->name('my_point_logs');
 Route::get('/removeimage/{image_id}', 'HomeController@removeimage')->name('removeimage');
+Route::get('/get_pending', 'HomeController@get_pending')->name('get_pending');
 Route::post('/change_language', [App\Http\Controllers\HomeController::class, 'change_language'])->name('change_language');

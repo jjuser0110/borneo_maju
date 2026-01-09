@@ -43,6 +43,7 @@ $currentRoute = request()->route()->getName();
             <a href="{{ route('order.pending') }}" class="menu-link" onclick="showLoading()">
                 <i class="menu-icon tf-icons bx bx-time-five"></i>
                 <div>{{ __('sidebar.pending_orders') }}</div>
+                <div class="badge bg-danger rounded-pill ms-auto" id="checkpending">0</div>
             </a>
         </li>
         @endif
@@ -116,3 +117,28 @@ $currentRoute = request()->route()->getName();
         @endif
     </ul>
 </aside>
+@if(Auth::user()->role_id != 3)
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script>
+    $( document ).ready(function() {
+        getPending();
+    });
+
+    window.setInterval(function()
+    {
+        getPending();
+    }, 5000);
+
+    function getPending(){
+        $.ajax({
+            url: "{{ route('get_pending') }}",
+            method: 'GET',
+            success: function(data) {
+                console.log(data);
+                var checkpending = document.getElementById("checkpending");
+                checkpending.innerHTML = data.pending_count;
+            },
+        })
+    }
+</script>
+@endif
