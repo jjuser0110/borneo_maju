@@ -16,88 +16,102 @@ class BankSeeder extends Seeder
     public function run()
     {
         Bank::truncate();
+
         $data = [
             [
-                'bank_name'=>'Maybank',
-                'short_name'=>'MBB',
+                'bank_name' => 'Bank Central Asia',
+                'short_name' => 'BCA',
             ],
             [
-                'bank_name'=>'CIMB Bank',
-                'short_name'=>'CIMB',
+                'bank_name' => 'Bank Mandiri',
+                'short_name' => 'MANDIRI',
             ],
             [
-                'bank_name'=>'Public Bank',
-                'short_name'=>'PBB',
+                'bank_name' => 'Bank Rakyat Indonesia',
+                'short_name' => 'BRI',
             ],
             [
-                'bank_name'=>'RHB Bank',
-                'short_name'=>'RHB',
+                'bank_name' => 'Bank Negara Indonesia',
+                'short_name' => 'BNI',
             ],
             [
-                'bank_name'=>'Hong Leong Bank',
-                'short_name'=>'HLB',
+                'bank_name' => 'Bank Tabungan Negara',
+                'short_name' => 'BTN',
             ],
             [
-                'bank_name'=>'AmBank',
-                'short_name'=>'AMB',
+                'bank_name' => 'CIMB Niaga',
+                'short_name' => 'CIMB',
             ],
             [
-                'bank_name'=>'UOB Bank',
-                'short_name'=>'UOB',
+                'bank_name' => 'Bank Danamon',
+                'short_name' => 'DANAMON',
             ],
             [
-                'bank_name'=>'Bank Rakyat',
-                'short_name'=>'BANK RAKYAT',
+                'bank_name' => 'Bank Permata',
+                'short_name' => 'PERMATA',
             ],
             [
-                'bank_name'=>'OCBC Bank',
-                'short_name'=>'OCBC',
+                'bank_name' => 'Bank Syariah Indonesia',
+                'short_name' => 'BSI',
             ],
             [
-                'bank_name'=>'HSBC Bank',
-                'short_name'=>'HSBC',
+                'bank_name' => 'Bank Mega',
+                'short_name' => 'MEGA',
             ],
             [
-                'bank_name'=>'Bank Islam',
-                'short_name'=>'ISLAM',
+                'bank_name' => 'Bank OCBC NISP',
+                'short_name' => 'OCBC',
             ],
             [
-                'bank_name'=>'Affin Bank',
-                'short_name'=>'AFFIN',
+                'bank_name' => 'Panin Bank',
+                'short_name' => 'PANIN',
             ],
             [
-                'bank_name'=>'Alliance Bank',
-                'short_name'=>'ALLIANCE',
+                'bank_name' => 'Bank Bukopin',
+                'short_name' => 'BUKOPIN',
             ],
             [
-                'bank_name'=>'Standard Charted Bank',
-                'short_name'=>'SCB',
+                'bank_name' => 'Bank Mayapada',
+                'short_name' => 'MAYAPADA',
             ],
             [
-                'bank_name'=>'MBSB Bank',
-                'short_name'=>'MBSB',
+                'bank_name' => 'Bank Sinarmas',
+                'short_name' => 'SINARMAS',
             ],
             [
-                'bank_name'=>'Citibank',
-                'short_name'=>'CITI',
+                'bank_name' => 'Bank BTPN',
+                'short_name' => 'BTPN',
             ],
             [
-                'bank_name'=>'Bank Simpanan Nasional (BSN)',
-                'short_name'=>'BSN',
+                'bank_name' => 'Bank Jago',
+                'short_name' => 'JAGO',
             ],
             [
-                'bank_name'=>'Bank Muamalat',
-                'short_name'=>'MUAMALAT',
+                'bank_name' => 'Bank Neo Commerce',
+                'short_name' => 'NEO',
             ],
             [
-                'bank_name'=>'Agrobank',
-                'short_name'=>'AGRO',
+                'bank_name' => 'SeaBank Indonesia',
+                'short_name' => 'SEABANK',
             ],
             [
-                'bank_name'=>'TNG',
-                'short_name'=>'TNG',
+                'bank_name' => 'GoPay / GoTo Financial',
+                'short_name' => 'GOPAY',
+            ],
+            [
+                'bank_name' => 'OVO',
+                'short_name' => 'OVO',
+            ],
+            [
+                'bank_name' => 'DANA',
+                'short_name' => 'DANA',
+            ],
+            [
+                'bank_name' => 'LinkAja',
+                'short_name' => 'LINKAJA',
             ],
         ];
+
         Bank::insert($data);
     }
 }
