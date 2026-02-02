@@ -1,0 +1,14 @@
+<?php
+
+namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('/bank_setting')->as('bank_setting.')->middleware(['auth'])->group(function() {
+    Route::get('/index', 'BankSettingController@index')->name('index');
+    Route::get('/create', 'BankSettingController@create')->name('create');
+    Route::post('/store', 'BankSettingController@store')->name('store');
+    Route::get('/edit/{bank_setting}', 'BankSettingController@edit')->name('edit');
+    Route::post('/update/{bank_setting}', 'BankSettingController@update')->name('update');
+    Route::get('/destroy/{bank_setting}', 'BankSettingController@destroy')->name('destroy');
+    Route::post('/adjust_money', 'BankSettingController@adjust_money')->name('adjust_money');
+});

@@ -46,6 +46,21 @@
 <!-- <script src="{{ asset('assets/js/config.js') }}"></script> -->
 
 <style>
+    .select2-container--default .select2-selection--single {
+        border: 1px solid #ced4da;
+        height: 38px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 36px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+
+</style>
+<style>
   #loading-screen {
     display: flex;
     align-items: center;

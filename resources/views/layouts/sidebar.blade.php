@@ -108,6 +108,13 @@ $currentRoute = request()->route()->getName();
             </ul>
         </li>
 
+        <li class="menu-item {{ Str::contains($currentRoute, 'bank_setting.index') ? 'active' : ''}}">
+            <a href="{{ route('bank_setting.index') }}" class="menu-link" onclick="showLoading()">
+                <i class="menu-icon tf-icons bx bx-building-house"></i>
+                <div>{{ __('sidebar.bank_setting') }}</div>
+            </a>
+        </li>
+
         <li class="menu-item {{ Str::contains($currentRoute, 'bank.index') ? 'active' : ''}}">
             <a href="{{ route('bank.index') }}" class="menu-link" onclick="showLoading()">
                 <i class="menu-icon tf-icons bx bx-building-house"></i>

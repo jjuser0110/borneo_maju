@@ -42,8 +42,8 @@
                             />
                         </div>
                         <div class="col-md-4 mb-4">
-                            <label for="select2Basic" class="form-label">{{ __('sidebar.bank') }}</label>
-                            <select id="select2Basic" name="bank_id" class="select2 form-select" data-allow-clear="true" required>
+                            <label for="bank_id" class="form-label">{{ __('sidebar.bank') }}</label>
+                            <select id="bank_id" name="bank_id" class="form-control select2" data-allow-clear="true" required>
                                 @foreach($bank as $bank)
                                     <option value="{{ $bank->id }}" @if(isset($order) && $order->bank_id == $bank->id) selected @endif>
                                         {{ $bank->bank_name ?? '' }}

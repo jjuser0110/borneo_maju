@@ -22,8 +22,16 @@ return [
     'agent'            => 'Agent',
 
     'banks'            => 'Banks',
+    'bank_settings'    => 'Bank Settings',
+    'bank_setting'     => 'Bank Setting',
+    'account_no'       => 'Account No',
+    'owner_name'       => 'Owner Name',
+    'amount'          => 'Amount',
+    'bank_setting_details'    => 'Bank Setting Details',
     'bank_listing'     => 'Bank Listing',
     'bank_details'     => 'Bank Details',
+    'account_no_placeholder' => 'Account No',
+    'owner_name_placeholder' => 'Owner Name',
 
     'balance'          => 'Bal',
     'english'          => 'English',
@@ -144,4 +152,7 @@ return [
     'orders_count' => 'Orders Count',
 
     'no'          => 'No',
+    'is_active'    => 'Is Active',
+    'adjust_amount' => 'Adjust Amount',
+    
 ];

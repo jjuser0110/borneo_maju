@@ -22,8 +22,16 @@ return [
     'agent'            => 'Ejen',
 
     'banks'            => 'Bank',
+    'bank_settings'    => 'Tetapan Bank',
+    'bank_setting'     => 'Tetapan Bank',
+    'account_no'       => 'No Akaun',
+    'owner_name'       => 'Nama Pemilik',
+    'amount'          => 'Jumlah',
+    'bank_setting_details'    => 'Butiran Tetapan Bank',
     'bank_listing'     => 'Senarai Bank',
     'bank_details'     => 'Butiran Bank',
+    'account_no_placeholder' => 'No Akaun',
+    'owner_name_placeholder' => 'Nama Pemilik',
 
     'balance'          => 'Baki',
     'english'          => 'Inggeris',
@@ -144,4 +152,6 @@ return [
     'orders_count' => 'Jumlah Pesanan',
 
     'no'          => 'No',
+    'is_active'    => 'Aktif',
+    'adjust_amount' => 'Laraskan Jumlah',
 ];

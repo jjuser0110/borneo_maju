@@ -22,8 +22,16 @@ return [
     'agent'            => '代理',
 
     'banks'            => '银行',
+    'bank_settings'    => '银行设置',
+    'bank_setting'     => '银行设置项',
+    'account_no'       => '账号',
+    'owner_name'       => '户主姓名',
+    'amount'          => '金额',
+    'bank_setting_details'    => '银行设置详情',
     'bank_listing'     => '银行列表',
     'bank_details'     => '银行详情',
+    'account_no_placeholder' => '账号',
+    'owner_name_placeholder' => '户主姓名',
 
     'balance'          => '余额',
     'english'          => '英语',
@@ -144,4 +152,7 @@ return [
     'orders_count' => '订单数量',
 
     'no'          => '序号',
+    'is_active'    => '是否激活',
+    'adjust_amount' => '调整金额',
+    
 ];
