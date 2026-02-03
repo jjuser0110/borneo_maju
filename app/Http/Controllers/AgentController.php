@@ -11,6 +11,7 @@ use Bouncer;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use DB;
 
 class AgentController extends Controller
 {
@@ -44,7 +45,7 @@ class AgentController extends Controller
         if($checkusername){
             return redirect()->back()->withErrors('Username already taken')->withInput();
         }
-        
+
         $request->merge(['password' => Hash::make($request->password),'role_id'=>3,'upline'=>Auth::user()->id]);
 
         $agent = User::create($request->all());
@@ -68,13 +69,13 @@ class AgentController extends Controller
                 'description' => 'Transfer To '.$agent->username
             ]);
         }
-        
+
         $agent->save_history()->create([
             'field_name' => 'idr_rate',
             'old_value' => null,
             'new_value' => $request->idr_rate,
         ]);
-        
+
         $agent->save_history()->create([
             'field_name' => 'processing_fees',
             'old_value' => null,
@@ -106,7 +107,7 @@ class AgentController extends Controller
         }else{
             $request->request->remove('password');
         }
-        
+
         if($request->idr_rate != $agent->idr_rate){
             $agent->save_history()->create([
                 'field_name' => 'idr_rate',
@@ -123,7 +124,7 @@ class AgentController extends Controller
                 'old_value' => $agent->processing_fees,
                 'new_value' => $request->processing_fees,
             ]);
-            
+
             $difference = $agent->processing_fees - $request->processing_fees;
             $this->updateDownlines($agent->downlines, 'processing_fees', $difference);
         }
@@ -157,5 +158,73 @@ class AgentController extends Controller
         }
     }
 
+    public function addPoint(Request $request, User $agent)
+    {
+        $request->validate([
+            'point' => 'required|integer|min:1',
+        ]);
 
+        $loginUser = Auth::user();
+
+        DB::transaction(function () use ($agent, $request, $loginUser) {
+
+            $agent = User::where('id', $agent->id)
+                ->lockForUpdate()
+                ->first();
+
+            $point_before = $agent->point;
+            $point_after  = $point_before + $request->point;
+
+            $agent->update([
+                'point' => $point_after,
+            ]);
+
+            PointHistory::create([
+                'agent_id'     => $agent->id,
+                'point_before' => $point_before,
+                'point'        => $request->point,
+                'point_after'  => $point_after,
+                'description'  => 'Top Up From ' . $loginUser->username,
+            ]);
+        });
+
+        return back()->with('success', 'Point added successfully');
+    }
+
+    public function deductPoint(Request $request, User $agent)
+    {
+        $request->validate([
+            'point' => 'required|integer|min:1',
+        ]);
+
+        $loginUser = Auth::user();
+
+        DB::transaction(function () use ($agent, $request, $loginUser) {
+
+            $agent = User::where('id', $agent->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $point_before = $agent->point;
+            $point_after  = $point_before - $request->point;
+
+            if ($point_after < 0) {
+                throw new \Exception('Insufficient points');
+            }
+
+            $agent->update([
+                'point' => $point_after,
+            ]);
+
+            PointHistory::create([
+                'agent_id'     => $agent->id,
+                'point_before' => $point_before,
+                'point'        => -$request->point,
+                'point_after'  => $point_after,
+                'description'  => 'Deducted by ' . $loginUser->username,
+            ]);
+        });
+
+        return back()->with('success', 'Point deducted successfully');
+    }
 }

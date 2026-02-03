@@ -154,4 +154,7 @@ return [
     'no'          => 'No',
     'is_active'    => 'Aktif',
     'adjust_amount' => 'Laraskan Jumlah',
+
+    'add_point' => 'Tambah Mata',
+    'deduct_point' => 'Tolak Mata',
 ];

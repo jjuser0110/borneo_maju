@@ -154,5 +154,7 @@ return [
     'no'          => '序号',
     'is_active'    => '是否激活',
     'adjust_amount' => '调整金额',
-    
+
+    'add_point' => '增加积分',
+    'deduct_point' => '减少积分',
 ];

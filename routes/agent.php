@@ -12,4 +12,7 @@ Route::prefix('/agent')->as('agent.')->middleware(['auth'])->group(function() {
     Route::get('/viewlog/{agent}', 'AgentController@viewlog')->name('viewlog');
     Route::post('/update/{agent}', 'AgentController@update')->name('update');
     Route::get('/destroy/{agent}', 'AgentController@destroy')->name('destroy');
+
+    Route::post('/add-point/{agent}', 'AgentController@addPoint')->name('addPoint');
+    Route::post('/deduct-point/{agent}', 'AgentController@deductPoint')->name('deductPoint');
 });

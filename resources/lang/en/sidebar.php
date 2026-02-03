@@ -154,5 +154,8 @@ return [
     'no'          => 'No',
     'is_active'    => 'Is Active',
     'adjust_amount' => 'Adjust Amount',
-    
+
+    'add_point' => 'Add Point',
+    'deduct_point' => 'Deduct Point',
+
 ];
