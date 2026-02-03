@@ -157,4 +157,8 @@ return [
 
     'add_point' => '增加积分',
     'deduct_point' => '减少积分',
+
+    'bank_logs' => '银行金额调整记录',
+    'adjustment-add' => '调整金额（增加）',
+    'adjustment-subtract' => '调整金额（减少）',
 ];

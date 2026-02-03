@@ -157,4 +157,8 @@ return [
 
     'add_point' => 'Tambah Mata',
     'deduct_point' => 'Tolak Mata',
+
+    'bank_logs' => 'Log Bank',
+    'adjustment-add' => 'Laraskan Jumlah (Tambah)',
+    'adjustment-subtract' => 'Laraskan Jumlah (Tolak)',
 ];

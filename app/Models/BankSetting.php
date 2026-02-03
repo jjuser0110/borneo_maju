@@ -27,6 +27,6 @@ class BankSetting extends Model
 
     public function bank_logs()
     {
-        return $this->morphMany('App\Models\BankLog', 'content');
+        return $this->morphMany('App\Models\BankLog', 'content')->orderBy('created_at', 'desc');
     }
 }

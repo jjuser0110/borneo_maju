@@ -11,4 +11,5 @@ Route::prefix('/bank_setting')->as('bank_setting.')->middleware(['auth'])->group
     Route::post('/update/{bank_setting}', 'BankSettingController@update')->name('update');
     Route::get('/destroy/{bank_setting}', 'BankSettingController@destroy')->name('destroy');
     Route::post('/adjust_money', 'BankSettingController@adjust_money')->name('adjust_money');
+    Route::get('/viewlog/{bank_setting}', 'BankSettingController@viewlog')->name('viewlog');
 });

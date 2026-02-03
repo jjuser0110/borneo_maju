@@ -11,6 +11,7 @@ use Bouncer;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use DB;
 
 class BankSettingController extends Controller
 {
@@ -55,30 +56,36 @@ class BankSettingController extends Controller
 
     public function adjust_money(Request $request)
     {
-        $bank_setting = BankSetting::find($request->bank_setting_id);
+        DB::transaction(function () use ($request) {
+            $bank_setting = BankSetting::lockForUpdate()->findOrFail($request->bank_setting_id);
 
-        dd($request->all());
-        $amount = $request->amount;
-        $prev_amount = $bank_setting->amount;
-        $after_amount = round($prev_amount + $amount, 2);
+            $amount       = (float) $request->amount;
+            $prev_amount  = (float) $bank_setting->amount;
+            $after_amount = round($prev_amount + $amount, 2);
 
-        if($amount > 0){
-            $type = 'adjustment-add';
-        }else{
-            $type = 'adjustment-subtract';
-        }
-        $bank_log = $bank_setting->bank_logs()->create([
-            'bank_setting_id' => $bank_setting->id,
-            'type' => $type,
-            'remarks' => $request->remarks,
-            'prev_amount' => $prev_amount,
-            'amount' => abs($amount),
-            'after_amount' => $after_amount,
-        ]);
-        $bank_setting->amount = $after_amount;
-        $bank_setting->save();
+            $type = $amount > 0
+                ? 'adjustment-add'
+                : 'adjustment-subtract';
 
-        return redirect()->route('bank_setting.index')->withSuccess('Amount adjusted');
+            $bank_setting->bank_logs()->create([
+                'bank_setting_id' => $bank_setting->id,
+                'type'           => $type,
+                'remarks'        => $request->remarks,
+                'prev_amount'    => $prev_amount,
+                'amount'         => abs($amount),
+                'after_amount'   => $after_amount,
+            ]);
+
+            $bank_setting->update([
+                'amount' => $after_amount,
+            ]);
+        });
+
+        return back()->withSuccess('Amount adjusted');
     }
 
+    public function viewlog(BankSetting $bank_setting)
+    {
+        return view('bank_setting.viewlog', compact('bank_setting'));
+    }
 }

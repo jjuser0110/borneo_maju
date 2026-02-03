@@ -158,4 +158,7 @@ return [
     'add_point' => 'Add Point',
     'deduct_point' => 'Deduct Point',
 
+    'bank_logs' => 'Bank Logs',
+    'adjustment-add' => 'Adjust Amount (Add)',
+    'adjustment-subtract' => 'Adjust Amount (Deduct)',
 ];
