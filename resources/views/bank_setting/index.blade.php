@@ -47,14 +47,14 @@
                         <td>{{ $row->bank->bank_name ?? "" }}</td>
                         <td>{{ $row->account_no ?? "" }}</td>
                         <td>{{ $row->owner_name ?? "" }}</td>
-                        <td>{{ number_format($row->amount,2) ?? "0.00" }}</td>
+                        <td>{{ number_format($row->amount) }}</td>
                         <td>
                             <a href="{{ route('bank_setting.viewlog', $row) }}" onclick="showLoading()">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                             </a>
-                            <a style="color:green;cursor:pointer" onclick="openMoneyModal({{ $row->id }})">
+                            {{-- <a style="color:green;cursor:pointer" onclick="openMoneyModal({{ $row->id }})">
                                 <i class="fa-solid fa-money-bill"></i>
-                            </a>
+                            </a> --}}
                             <a href="{{ route('bank_setting.edit', $row) }}" onclick="showLoading()">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>

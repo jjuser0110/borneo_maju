@@ -7,6 +7,7 @@ use Spatie\Browsershot\Browsershot;
 use Illuminate\Http\Request;
 use App\Models\Bank;
 use App\Models\BankSetting;
+use App\Models\Stock;
 use Bouncer;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -64,8 +65,8 @@ class BankSettingController extends Controller
             $after_amount = round($prev_amount + $amount, 2);
 
             $type = $amount > 0
-                ? 'adjustment-add'
-                : 'adjustment-subtract';
+                ? 'adjustment_add'
+                : 'adjustment_subtract';
 
             $bank_setting->bank_logs()->create([
                 'bank_setting_id' => $bank_setting->id,
@@ -87,5 +88,61 @@ class BankSettingController extends Controller
     public function viewlog(BankSetting $bank_setting)
     {
         return view('bank_setting.viewlog', compact('bank_setting'));
+    }
+
+    public function addStock(Request $request)
+    {
+        $request->validate([
+            'bank_setting_id' => 'required',
+            'idr_rate'        => 'required|numeric|min:0',
+            'myr_amount'      => 'required|numeric|min:0',
+            'idr_amount'      => 'required|numeric',
+        ]);
+
+        DB::transaction(function () use ($request) {
+            $expectedIdr = (int) round($request->myr_amount * $request->idr_rate);
+            $actualIdr   = (int) round($request->idr_amount);
+
+            if ($expectedIdr !== $actualIdr) {
+                throw new \Exception(
+                    'IDR amount does not match MYR amount × IDR rate'
+                );
+            }
+
+            $bank_setting = BankSetting::lockForUpdate()->findOrFail($request->bank_setting_id);
+
+            $amount       = (float) $request->idr_amount;
+            $prev_amount  = (float) $bank_setting->amount;
+            $after_amount = round($prev_amount + $amount, 2);
+
+            $type = $amount > 0 ? 'stock_in' : 'stock_out';
+
+            $stock = $bank_setting->stocks()->create([
+                'idr_rate'    => $request->idr_rate,
+                'myr_amount'  => $request->myr_amount,
+                'idr_amount'  => $amount,
+                'idr_balance' => $amount,
+            ]);
+
+            $bank_setting->bank_logs()->create([
+                'bank_setting_id' => $bank_setting->id,
+                'type'            => $type,
+                'remarks'         => null,
+                'prev_amount'     => $prev_amount,
+                'amount'          => abs($amount),
+                'after_amount'    => $after_amount,
+            ]);
+
+            $bank_setting->update([
+                'amount' => $after_amount,
+            ]);
+        });
+
+        return back()->withSuccess('Stock added');
+    }
+
+    public function view_stock_log(Stock $stock)
+    {
+        return view('bank_setting.stocklog', compact('stock'));
     }
 }

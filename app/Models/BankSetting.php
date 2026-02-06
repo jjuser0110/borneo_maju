@@ -29,4 +29,14 @@ class BankSetting extends Model
     {
         return $this->morphMany('App\Models\BankLog', 'content')->orderBy('created_at', 'desc');
     }
+
+    public function stocks()
+    {
+        return $this->hasMany(Stock::class);
+    }
+
+    public function getStockAmountAttribute()
+    {
+        return $this->hasMany(Stock::class)->sum('idr_amount');
+    }
 }

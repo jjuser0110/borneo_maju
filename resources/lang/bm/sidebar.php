@@ -8,6 +8,8 @@ return [
 
     'orders_section'   => 'Pesanan',
     'sales_report'     => 'Laporan Jualan',
+    'reports'          => 'Laporan',
+    'daily_report'     => 'Laporan Harian',
     'orders'           => 'Pesanan',
     'order_listing'    => 'Senarai Pesanan',
     'order_details'    => 'Butiran Pesanan',
@@ -159,6 +161,14 @@ return [
     'deduct_point' => 'Tolak Mata',
 
     'bank_logs' => 'Log Bank',
-    'adjustment-add' => 'Laraskan Jumlah (Tambah)',
-    'adjustment-subtract' => 'Laraskan Jumlah (Tolak)',
+    'adjustment_add' => 'Laraskan Jumlah (Tambah)',
+    'adjustment_subtract' => 'Laraskan Jumlah (Tolak)',
+
+    'stocks' => 'Stok',
+    'add_stock' => 'Tambah Stok',
+    'stock_logs' => 'Log Stok',
+    'stock_in' => 'Stok Tambah',
+    'stock_out' => 'Stok Tolak',
+    'capital_used' => 'Jumlah Digunakan',
+    'amount_received' => 'Jumlah Terima',
 ];

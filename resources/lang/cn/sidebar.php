@@ -8,6 +8,8 @@ return [
 
     'orders_section'   => '订单',
     'sales_report'     => '销售报告',
+    'reports'          => '报告',
+    'daily_report'     => '每日报告',
     'orders'           => '订单',
     'order_listing'    => '订单列表',
     'order_details'    => '订单详情',
@@ -159,6 +161,14 @@ return [
     'deduct_point' => '减少积分',
 
     'bank_logs' => '银行金额调整记录',
-    'adjustment-add' => '调整金额（增加）',
-    'adjustment-subtract' => '调整金额（减少）',
+    'adjustment_add' => '调整金额（增加）',
+    'adjustment_subtract' => '调整金额（减少）',
+
+    'stocks' => '库存',
+    'add_stock' => '添加库存',
+    'stock_logs' => '库存记录',
+    'stock_in' => '库存增加',
+    'stock_out' => '库存减少',
+    'capital_used' => '使用本金',
+    'amount_received' => '收到金额',
 ];

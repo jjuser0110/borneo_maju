@@ -16,7 +16,7 @@
                 <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 </div>
             </div>
-            
+
             <div class="card-datatable text-nowrap">
                 <table class="dt-column-search table table-bordered" id="mytable">
                     <thead>
@@ -37,7 +37,7 @@
                             <td>{{$row->order_no??""}}</td>
                             <td>{{$row->order_datetime??""}}</td>
                             <td>{{$row->bank->bank_name??""}}</td>
-                            <td>{{$row->idr_amount??""}}</td>
+                            <td>{{ number_format($row->idr_amount) }}</td>
                             <td>{{$row->status??""}}</td>
                             <td>
                                 <a class="btn btn-primary" href="{{ route('order.view',$row) }}">{{ __('sidebar.handle') }}</a>

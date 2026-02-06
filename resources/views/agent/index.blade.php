@@ -14,18 +14,18 @@
                     <h5 class="card-title mb-0">{{ __('sidebar.agent_listing') }}</h5>
                 </div>
                 <div class="dt-action-buttons text-end pt-3 pt-md-0">
-                    <div class="dt-buttons"> 
+                    <div class="dt-buttons">
                         <a class="dt-button create-new btn btn-primary"
                            type="button"
                            href="{{ route('agent.create') }}"
                            onclick="showLoading()">
                             <span>
-                                <i class="bx bx-plus me-sm-1"></i> 
+                                <i class="bx bx-plus me-sm-1"></i>
                                 <span class="d-none d-sm-inline-block">
                                     {{ __('sidebar.add_new_record') }}
                                 </span>
                             </span>
-                        </a> 
+                        </a>
                     </div>
                 </div>
             </div>
@@ -58,9 +58,9 @@
                             <td>{{ $row->role->title ?? "" }}</td>
                             <td>{{ $row->point ?? "" }}</td>
                             <td>{{ $row->idr_rate ?? "" }}</td>
-                            <td>{{ $row->processing_fees ?? "" }}</td>
+                            <td>{{ number_format($row->processing_fees, 2) }}</td>
                             <td>
-                                {!! isset($row) && $row->is_active == 1 
+                                {!! isset($row) && $row->is_active == 1
                                     ? '<span style="color:green">' . __('sidebar.active') . '</span>'
                                     : '<span style="color:red">' . __('sidebar.inactive') . '</span>' !!}
                             </td>

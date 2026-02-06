@@ -73,14 +73,14 @@
                             <i class="bx bxl-react text-info me-2"></i>
                             <div class="d-flex flex-wrap">
                                 <span class="fw-medium me-2">{{ __('sidebar.idr_rate') }}</span>
-                                <span>{{ number_format($order->idr_rate ?? 0, 2) }}</span>
+                                <span>{{ $order->idr_rate ?? 0 }}</span>
                             </div>
                         </li>
                         <li class="d-flex align-items-center mb-3">
                             <i class="bx bxl-react text-info me-2"></i>
                             <div class="d-flex flex-wrap">
                                 <span class="fw-medium me-2">{{ __('sidebar.idr_amount') }}</span>
-                                <span>{{ number_format($order->idr_amount ?? 0, 2) }}</span>
+                                <span>{{ number_format($order->idr_amount ?? 0) }}</span>
                             </div>
                         </li>
                     </ul>
@@ -120,6 +120,18 @@
                                 <span>{{ $order->status_by->username ?? '' }}</span>
                             </li>
                             <li class="d-flex align-items-center mb-3">
+                                <i class="bx bx-user bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.bank') }}:</span>
+                                @if(isset($view) && $view)
+                                    <span>{{ $order->bankSetting->owner_name ?? '' }}</span>
+                                @else
+                                    <select class="form-control" name="bank_setting_id">
+                                        @foreach ($bankSettings as $bankSetting)
+                                            <option value="{{ $bankSetting->id }}" {{ $order->bank_setting_id == $bankSetting->id ? 'checked' : '' }}>{{ $bankSetting->owner_name }} (IDR {{ number_format($bankSetting->amount) }})</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                            </li>
+                            <li class="d-flex align-items-center mb-3">
                                 <i class="bx bx-user bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.remarks') }}:</span>
                                 @if(isset($view) && $view)
                                     <span style="width:100%">{{ $order->remarks ?? '' }}</span>
@@ -135,7 +147,11 @@
                                         <a style="color:red" onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){window.location.href='{{ route('removeimage',$order->last_image->id) }}'}"><i class="bx bx-trash"></i></a>
                                     @endif
                                 @else
-                                    <span style="width:100%"><input type="file" class="form-control" name="receipt" accept="image/*,application/pdf"></span>
+                                    @if(!isset($view) || !$view)
+                                        <span style="width:100%"><input type="file" class="form-control" name="receipt" accept="image/*,application/pdf"></span>
+                                    @else
+                                        -
+                                    @endif
                                 @endif
                             </li>
                         </ul>
@@ -175,12 +191,12 @@
                                 @foreach($details as $row)
                                     <tr>
                                         <td>{{ $row->user->username ?? '' }}</td>
-                                        <td>{{ $row->idr_amount ?? '' }}</td>
+                                        <td>{{ number_format($row->idr_amount) }}</td>
                                         <td>{{ $row->idr_rate ?? '' }}</td>
-                                        <td>{{ $row->myr_amount ?? '' }}</td>
-                                        <td>{{ $row->processing_fees ?? '' }}</td>
-                                        <td>{{ $row->do_up ?? '' }}</td>
-                                        <td>{{ $row->profit ?? '' }}</td>
+                                        <td>{{ number_format($row->myr_amount, 2) }}</td>
+                                        <td>{{ number_format($row->processing_fees, 2) }}</td>
+                                        <td>{{ number_format($row->do_up, 2) }}</td>
+                                        <td>{{ number_format($row->profit, 2) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

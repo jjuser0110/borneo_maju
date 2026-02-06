@@ -13,7 +13,7 @@
                 <div class="head-label">
                     <h5 class="card-title mb-0">{{ __('sidebar.order_listing') }}</h5>
                 </div>
-                
+
                 <div class="col-md-6 col-12 mb-4">
                     <form method="GET">
                         <div class="input-group input-daterange">
@@ -26,16 +26,16 @@
                 </div>
 
                 <div class="dt-action-buttons text-end pt-3 pt-md-0">
-                    <div class="dt-buttons"> 
+                    <div class="dt-buttons">
                         <a class="dt-button create-new btn btn-primary" type="button" href="{{route('order.create')}}" onclick="showLoading()">
-                            <span><i class="bx bx-plus me-sm-1"></i> 
+                            <span><i class="bx bx-plus me-sm-1"></i>
                                 <span class="d-none d-sm-inline-block">{{ __('sidebar.add_new_record') }}</span>
                             </span>
-                        </a> 
+                        </a>
                     </div>
                 </div>
             </div>
-            
+
             <div class="card-datatable text-nowrap">
                 <table class="dt-column-search table table-bordered" id="mytable">
                     <thead>
@@ -67,10 +67,10 @@
                             <td>{{$row->account_no??""}}</td>
                             <td>{{$row->fullname??""}}</td>
                             <td>{{$row->idr_rate??""}}</td>
-                            <td>{{$row->myr_amount??""}}</td>
-                            <td>{{$row->idr_amount??""}}</td>
-                            <td>{{$row->processing_fees??""}}</td>
-                            <td>{{$row->total_amount??""}}</td>
+                            <td>{{number_format($row->myr_amount, 2)}}</td>
+                            <td>{{number_format($row->idr_amount)}}</td>
+                            <td>{{number_format($row->processing_fees, 2)}}</td>
+                            <td>{{number_format($row->total_amount, 2)}}</td>
                             <td>{{$row->status??""}}</td>
                             <td>
                                 <a href="{{ route('order.view_details',$row) }}" onclick="showLoading()"><i class="fa-solid fa-eye"></i></a>

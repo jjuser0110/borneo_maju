@@ -121,6 +121,17 @@ $currentRoute = request()->route()->getName();
                 <div>{{ __('sidebar.banks') }}</div>
             </a>
         </li>
+
+        {{-- Settings --}}
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">{{ __('sidebar.reports') }}</span>
+        </li>
+        <li class="menu-item {{ Str::contains($currentRoute, 'report.daily_report') ? 'active' : ''}}">
+            <a href="{{ route('report.daily_report') }}" class="menu-link" onclick="showLoading()">
+                <i class="menu-icon tf-icons bx bx-line-chart"></i>
+                <div>{{ __('sidebar.daily_report') }}</div>
+            </a>
+        </li>
         @endif
     </ul>
 </aside>

@@ -9,6 +9,8 @@ use App\Models\Bank;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Profit;
+use App\Models\Stock;
 use Bouncer;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -132,6 +134,54 @@ class ReportController extends Controller
             'total_do_up' => $total_do_up,
             'earning'    => $earning,
         ]);
+    }
+
+    public function daily_report(Request $request)
+    {
+        /** ---------------------------
+         *  LOGIN USER
+         * ---------------------------- */
+        if (Auth::user()->role_id !== 1) {
+            return back()->withErrors('Access denied');
+        }
+
+        /** ---------------------------
+         *  DATE RANGE
+         * ---------------------------- */
+        $date = $request->date;
+
+        $date_from = $request->date
+            ? Carbon::parse($request->date)->startOfDay()
+            : Carbon::now()->startOfDay();
+
+        $date_to = $request->date
+            ? Carbon::parse($request->date)->endOfDay()
+            : Carbon::now()->endOfDay();
+
+        $stock_in = Stock::where('created_at', '>=', $date_from)
+            ->where('created_at', '<=', $date_to)
+            ->sum('idr_amount');
+
+        $orders = Order::where('status_at', '>=', $date_from)
+            ->where('status_at', '<=', $date_to);
+
+        $stock_out = $orders->sum('idr_amount');
+
+        $profits = Profit::whereHas('order', function ($q) use ($date_from, $date_to) {
+            $q->whereBetween('status_at', [$date_from, $date_to]);
+        });
+        $capital_used     = $profits->sum('capital_used');
+        $amount_received  = $profits->sum('amount_received');
+        $profit           = $profits->sum('profit');
+
+        return view('report.daily_report', compact(
+            'date',
+            'stock_in',
+            'stock_out',
+            'capital_used',
+            'amount_received',
+            'profit',
+        ));
     }
 
 }

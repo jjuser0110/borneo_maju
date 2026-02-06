@@ -27,6 +27,7 @@ class Order extends Model
         'status_at',
         'status_by_id',
         'duration',
+        'bank_setting_id',
         'remarks',
     ];
 
@@ -66,9 +67,19 @@ class Order extends Model
             ->whereColumn('order_details.user_id', 'orders.user_id');
     }
 
+    public function bankSetting()
+    {
+        return $this->belongsTo(BankSetting::class);
+    }
 
+    public function profit()
+    {
+        return $this->hasOne(Profit::class);
+    }
 
-    
+    public function stock_logs()
+    {
+        return $this->hasMany(StockLog::class);
+    }
 }
 
-            

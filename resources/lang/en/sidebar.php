@@ -8,6 +8,8 @@ return [
 
     'orders_section'   => 'Orders',
     'sales_report'     => 'Sales Report',
+    'reports'          => 'Reports',
+    'daily_report'     => 'Daily Report',
     'orders'           => 'Orders',
     'order_listing'    => 'Order Listing',
     'order_details'    => 'Order Details',
@@ -159,6 +161,14 @@ return [
     'deduct_point' => 'Deduct Point',
 
     'bank_logs' => 'Bank Logs',
-    'adjustment-add' => 'Adjust Amount (Add)',
-    'adjustment-subtract' => 'Adjust Amount (Deduct)',
+    'adjustment_add' => 'Adjust Amount (Add)',
+    'adjustment_subtract' => 'Adjust Amount (Deduct)',
+
+    'stocks' => 'Stocks',
+    'add_stock' => 'Add Stock',
+    'stock_logs' => 'Stock Logs',
+    'stock_in' => 'Stock In',
+    'stock_out' => 'Stock Out',
+    'capital_used' => 'Capital Used',
+    'amount_received' => 'Amount Received',
 ];
