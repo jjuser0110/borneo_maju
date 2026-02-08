@@ -100,14 +100,14 @@ class BankSettingController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
-            $expectedIdr = (int) round($request->myr_amount * $request->idr_rate);
-            $actualIdr   = (int) round($request->idr_amount);
+            // $expectedIdr = (int) round($request->myr_amount * $request->idr_rate);
+            // $actualIdr   = (int) round($request->idr_amount);
 
-            if ($expectedIdr !== $actualIdr) {
-                throw new \Exception(
-                    'IDR amount does not match MYR amount × IDR rate'
-                );
-            }
+            // if ($expectedIdr !== $actualIdr) {
+            //     throw new \Exception(
+            //         'IDR amount does not match MYR amount × IDR rate'
+            //     );
+            // }
 
             $bank_setting = BankSetting::lockForUpdate()->findOrFail($request->bank_setting_id);
 
