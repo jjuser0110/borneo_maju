@@ -68,6 +68,7 @@ class AgentController extends Controller
                 'point_after' => $point_after,
                 'description' => 'Transfer To '.$agent->username
             ]);
+            $loginUser->update(['point'=>$point_after]);
         }
 
         $agent->save_history()->create([
@@ -186,6 +187,20 @@ class AgentController extends Controller
                 'point_after'  => $point_after,
                 'description'  => 'Top Up From ' . $loginUser->username,
             ]);
+
+            
+            if($loginUser->role_id == 3){
+                $loginuser_point_before = $loginUser->point;
+                $loginuser_point_after = $loginUser->point - $request->point;
+                PointHistory::create([
+                    'agent_id' => $loginUser->id,
+                    'point_before' => $loginuser_point_before,
+                    'point' => -$request->point,
+                    'point_after' => $loginuser_point_after,
+                    'description' => 'Transfer To '.$agent->username
+                ]);
+                $loginUser->update(['point'=>$loginuser_point_after]);
+            }
         });
 
         return back()->with('success', 'Point added successfully');
@@ -223,6 +238,19 @@ class AgentController extends Controller
                 'point_after'  => $point_after,
                 'description'  => 'Deducted by ' . $loginUser->username,
             ]);
+
+            if($loginUser->role_id == 3){
+                $loginuser_point_before = $loginUser->point;
+                $loginuser_point_after = $loginUser->point + $request->point;
+                PointHistory::create([
+                    'agent_id' => $loginUser->id,
+                    'point_before' => $loginuser_point_before,
+                    'point' => $request->point,
+                    'point_after' => $loginuser_point_after,
+                    'description' => 'Deducted '.$agent->username
+                ]);
+                $loginUser->update(['point'=>$loginuser_point_after]);
+            }
         });
 
         return back()->with('success', 'Point deducted successfully');
