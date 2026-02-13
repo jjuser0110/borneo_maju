@@ -74,9 +74,9 @@
                             <td>{{$row->status??""}}</td>
                             <td>
                                 <a href="{{ route('order.view_details',$row) }}" onclick="showLoading()"><i class="fa-solid fa-eye"></i></a>
-                                @if($row->status == 'pending')
-                                <a href="{{ route('order.edit',$row) }}" onclick="showLoading()"><i class="fa-solid fa-pen-to-square"></i></a>
-                                <a style="color:red;cursor:pointer" onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){showLoading();window.location.href='{{ route('order.destroy',$row) }}'}"><i class="fa-solid fa-trash"></i></a>
+                                @if (Auth::user()->id === $row->user_id && $row->status == 'pending')
+                                    <a href="{{ route('order.edit',$row) }}" onclick="showLoading()"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a style="color:red;cursor:pointer" onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){showLoading();window.location.href='{{ route('order.destroy',$row) }}'}"><i class="fa-solid fa-trash"></i></a>
                                 @endif
                             </td>
                         </tr>

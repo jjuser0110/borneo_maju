@@ -111,29 +111,52 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $loginUser = Auth::user();
-        $total_amount = round($request->myr_amount + $request->processing_fees, 2);
-        $request->merge(['user_id' => $loginUser->id, 'total_amount' => $total_amount]);
-        $order = Order::create($request->all());
-        $check = RunningNumber::where('code', $request->code)
-            ->where('year', $request->year)
-            ->where('month', $request->month)
-            ->first();
-        $check->increment('running_no');
 
-        $point_before = $loginUser->point;
-        $point_after = round($loginUser->point - $request->myr_amount, 2);
-        PointHistory::create([
-            'agent_id' => $loginUser->id,
-            'point_before' => $point_before,
-            'point' => $request->myr_amount,
-            'point_after' => $point_after,
-            'description' => 'Order '.$order->order_no
+        $request->validate([
+            'myr_amount' => 'required|numeric|min:0',
+            'processing_fees' => 'required|numeric|min:0',
         ]);
-        $loginUser->update(['point'=>$point_after]);
 
-        return redirect()->route('order.index')->withSuccess('Data saved');
+        if ($loginUser->point < $request->myr_amount) {
+            return redirect()->back()->withError('Insufficient point balance.');
+        }
+
+        return DB::transaction(function () use ($request, $loginUser) {
+
+            $total_amount = round($request->myr_amount + $request->processing_fees, 2);
+
+            $request->merge([
+                'user_id' => $loginUser->id,
+                'total_amount' => $total_amount
+            ]);
+
+            $order = Order::create($request->all());
+
+            $check = RunningNumber::where('code', $request->code)
+                ->where('year', $request->year)
+                ->where('month', $request->month)
+                ->first();
+
+            if ($check) {
+                $check->increment('running_no');
+            }
+
+            $point_before = $loginUser->point;
+            $point_after = round($point_before - $request->myr_amount, 2);
+
+            PointHistory::create([
+                'agent_id' => $loginUser->id,
+                'point_before' => $point_before,
+                'point' => $request->myr_amount,
+                'point_after' => $point_after,
+                'description' => 'Order ' . $order->order_no
+            ]);
+
+            $loginUser->update(['point' => $point_after]);
+
+            return redirect()->route('order.index')->withSuccess('Data saved');
+        });
     }
 
     public function edit(Order $order)
@@ -150,21 +173,70 @@ class OrderController extends Controller
         if($order->status != 'pending'){
             return redirect()->route('order.index')->withError('Only pending order can be updated');
         }
-        $total_amount = round($request->myr_amount + $request->processing_fees, 2);
-        $request->merge(['total_amount' => $total_amount]);
-        $order->update($request->all());
-        return redirect()->route('order.index')->withSuccess('Data updated');
+
+        $loginUser = Auth::user();
+        if ($loginUser->id !== $order->user_id) {
+            return redirect()->route('order.index')->withError('Only the creator can editthis order.');
+        }
+
+        return DB::transaction(function () use ($request, $order, $loginUser) {
+
+            $point_before = $loginUser->point;
+            $total_amount = round($request->myr_amount + $request->processing_fees, 2);
+
+            $old_myr_amount = $order->myr_amount;
+            $new_myr_amount = $request->myr_amount;
+            $adjustment = round($old_myr_amount - $new_myr_amount, 2);
+            $point_after = round($point_before + $adjustment, 2);
+
+            $request->merge(['total_amount' => $total_amount]);
+            $order->update($request->all());
+
+            PointHistory::create([
+                'agent_id' => $loginUser->id,
+                'point_before' => $point_before,
+                'point' => $adjustment,
+                'point_after' => $point_after,
+                'description' => 'Update Order '.$order->order_no
+            ]);
+
+            $loginUser->update(['point' => $point_after]);
+
+            return redirect()->route('order.index')->withSuccess('Data updated');
+        });
     }
 
     public function destroy(Order $order)
     {
-        if($order->status == 'pending'){
-            $order->delete();
-        }else{
+        $loginUser = Auth::user();
+        if ($loginUser->id !== $order->user_id) {
+            return redirect()->route('order.index')->withError('Only the creator can delete this order.');
+        }
+
+        if($order->status != 'pending'){
             return redirect()->route('order.index')->withError('Only pending order can be deleted');
         }
 
-        return redirect()->route('order.index')->withSuccess('Data deleted');
+        return DB::transaction(function () use ($order, $loginUser) {
+
+            $point_before = $loginUser->point;
+            $refund_amount = $order->myr_amount;
+            $point_after = round($point_before + $refund_amount, 2);
+
+            PointHistory::create([
+                'agent_id' => $loginUser->id,
+                'point_before' => $point_before,
+                'point' => $refund_amount,
+                'point_after' => $point_after,
+                'description' => 'Delete Order ' . $order->order_no . ' (Refunded)'
+            ]);
+
+            $loginUser->update(['point' => $point_after]);
+
+            $order->delete();
+
+            return redirect()->route('order.index')->withSuccess('Order deleted and points refunded.');
+        });
     }
 
     public function pending_update(Request $request, Order $order)
