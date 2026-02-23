@@ -58,7 +58,9 @@ class OrderController extends Controller
     public function view(Request $request, Order $order)
     {
         $loginUser = Auth::user();
-        $order->update(['status'=>'processing']);
+        if ($order->status == 'pending') {
+            $order->update(['status'=>'processing']);
+        }
         $bankSettings = BankSetting::where('is_active', 1)->get();
 
         return view('order.view')->with('order',$order)->with('bankSettings', $bankSettings);
@@ -176,7 +178,7 @@ class OrderController extends Controller
 
         $loginUser = Auth::user();
         if ($loginUser->id !== $order->user_id) {
-            return redirect()->route('order.index')->withError('Only the creator can editthis order.');
+            return redirect()->route('order.index')->withError('Only the creator can edit this order.');
         }
 
         return DB::transaction(function () use ($request, $order, $loginUser) {
@@ -241,151 +243,225 @@ class OrderController extends Controller
 
     public function pending_update(Request $request, Order $order)
     {
-        if ($order->status === 'completed') {
-            return redirect()->route('order.edit', $order)->withErrors('Order is completed.');
+        if ($request->has('status')) {
+            if ($order->status === 'completed') {
+                return redirect()->route('order.edit', $order)->withErrors('Order is completed.');
+            }
+
+            if ($order->status === 'cancelled') {
+                return redirect()->route('order.edit', $order)->withErrors('Order is cancelled.');
+            }
         }
 
-        try {
-            DB::transaction(function () use ($request, $order) {
+        if ($request->status == 'completed') {
 
-                $bank_setting = BankSetting::lockForUpdate()->findOrFail($request->bank_setting_id);
+            try {
+                DB::transaction(function () use ($request, $order) {
 
-                if ($bank_setting->amount < $order->idr_amount) {
-                    throw new \Exception('Amount in selected bank is less than order amount.');
-                }
+                    $bank_setting = BankSetting::lockForUpdate()->findOrFail($request->bank_setting_id);
 
-                // Update order
-                $order->update([
-                    'status'          => 'completed',
-                    'status_at'       => now(),
-                    'status_by_id'    => Auth::id(),
-                    'bank_setting_id' => $request->bank_setting_id,
-                    'remarks'         => $request->remarks,
-                ]);
-
-                // Receipt upload
-                if ($request->hasFile('receipt')) {
-                    $upload = $this->upload($request->receipt, 'receipt', $order->id);
-
-                    $order->file_attachments()->create([
-                        'file_name' => $upload['file_name'],
-                        'file_path' => $upload['file_path'],
-                        'file_type' => $upload['file_type'],
-                    ]);
-                }
-
-                $idrAmount   = $order->idr_amount;
-                $orderTotal  = $order->total_amount;
-
-                // Start from order owner
-                $currentUser = $order->user;
-                $amount_received = 0;
-
-                while ($currentUser) {
-                    if($currentUser->role_id == 1){
-                        // Admin does not get commission
-                        break;
+                    if ($bank_setting->amount < $order->idr_amount) {
+                        throw new \Exception('Amount in selected bank is less than order amount.');
                     }
-                    $myrAmount = round($idrAmount / $currentUser->idr_rate, 2);
-                    $totalAmount = round($myrAmount + $currentUser->processing_fees, 2);
-                    $profit = round($orderTotal - $totalAmount, 2);
 
-                    $order_details = OrderDetail::create([
-                        'order_id'         => $order->id,
-                        'user_id'          => $currentUser->id,
-                        'idr_amount'       => $idrAmount,
-                        'idr_rate'         => $currentUser->idr_rate,
-                        'myr_amount'       => $myrAmount,
-                        'processing_fees'  => $currentUser->processing_fees,
-                        'total_amount'     => $totalAmount,
-                        'upline'           => $currentUser->upline,
-                        'do_up'            => $totalAmount,
-                        'profit'           => $profit,
+                    // Update order
+                    $order->update([
+                        'status'          => $request->status,
+                        'status_at'       => now(),
+                        'status_by_id'    => Auth::id(),
+                        'bank_setting_id' => $request->bank_setting_id,
+                        'remarks'         => $request->remarks,
                     ]);
 
-                    // Move up
-                    $orderTotal = $totalAmount;
-                    $currentUser = $currentUser->upline
-                        ? User::find($currentUser->upline)
-                        : null;
+                    // Receipt upload
+                    if ($request->hasFile('receipt')) {
+                        $upload = $this->upload($request->receipt, 'receipt', $order->id);
 
-                    if($currentUser && $currentUser->role_id != 1){
-                        $myrAmount2 = round($idrAmount / $currentUser->idr_rate, 2);
-                        $totalAmount2 = round($myrAmount2 + $currentUser->processing_fees, 2);
-                        $order_details->update([
-                            'agent_do_up' => $totalAmount2,
+                        $order->file_attachments()->create([
+                            'file_name' => $upload['file_name'],
+                            'file_path' => $upload['file_path'],
+                            'file_type' => $upload['file_type'],
                         ]);
-                    } else {
-                        $amount_received = $order_details->do_up;
                     }
-                }
 
-                $qty_needed = $idrAmount;
-                $totalDeducted = 0;
-                while ($qty_needed > 0) {
-                    $stock = Stock::where('bank_setting_id', $bank_setting->id)
-                        ->where('idr_balance', '>', 0)
-                        ->orderBy('created_at', 'ASC')
-                        ->lockForUpdate()
-                        ->first();
+                    $idrAmount   = $order->idr_amount;
+                    $orderTotal  = $order->total_amount;
 
-                    if (!$stock) {
-                        $take = $qty_needed;
+                    // Start from order owner
+                    $currentUser = $order->user;
+                    $amount_received = 0;
+
+                    while ($currentUser) {
+                        if($currentUser->role_id == 1){
+                            // Admin does not get commission
+                            break;
+                        }
+                        $myrAmount = round($idrAmount / $currentUser->idr_rate, 2);
+                        $totalAmount = round($myrAmount + $currentUser->processing_fees, 2);
+                        $profit = round($orderTotal - $totalAmount, 2);
+
+                        $order_details = OrderDetail::create([
+                            'order_id'         => $order->id,
+                            'user_id'          => $currentUser->id,
+                            'idr_amount'       => $idrAmount,
+                            'idr_rate'         => $currentUser->idr_rate,
+                            'myr_amount'       => $myrAmount,
+                            'processing_fees'  => $currentUser->processing_fees,
+                            'total_amount'     => $totalAmount,
+                            'upline'           => $currentUser->upline,
+                            'do_up'            => $totalAmount,
+                            'profit'           => $profit,
+                        ]);
+
+                        // Move up
+                        $orderTotal = $totalAmount;
+                        $currentUser = $currentUser->upline
+                            ? User::find($currentUser->upline)
+                            : null;
+
+                        if($currentUser && $currentUser->role_id != 1){
+                            $myrAmount2 = round($idrAmount / $currentUser->idr_rate, 2);
+                            $totalAmount2 = round($myrAmount2 + $currentUser->processing_fees, 2);
+                            $order_details->update([
+                                'agent_do_up' => $totalAmount2,
+                            ]);
+                        } else {
+                            $amount_received = $order_details->do_up;
+                        }
+                    }
+
+                    $qty_needed = $idrAmount;
+                    $totalDeducted = 0;
+                    while ($qty_needed > 0) {
+                        $stock = Stock::where('bank_setting_id', $bank_setting->id)
+                            ->where('idr_balance', '>', 0)
+                            ->orderBy('created_at', 'ASC')
+                            ->lockForUpdate()
+                            ->first();
+
+                        if (!$stock) {
+                            $take = $qty_needed;
+
+                            $totalDeducted += $take;
+                            break;
+                        }
+
+                        $take = min($qty_needed, $stock->idr_balance);
+
+                        $stock->stock_logs()->create([
+                            'bank_setting_id' => $bank_setting->id,
+                            'order_id'        => $order->id,
+                            'idr_amount'      => $take,
+                            'stock_idr_rate'  => $stock->idr_rate,
+                            'capital_used'    => round($take / $stock->idr_rate, 2),
+                        ]);
+
+                        $stock->update([
+                            'idr_balance' => $stock->idr_balance - $take,
+                        ]);
 
                         $totalDeducted += $take;
-                        break;
+                        $qty_needed -= $take;
                     }
 
-                    $take = min($qty_needed, $stock->idr_balance);
+                    $amount       = (float) $totalDeducted;
+                    $prev_amount  = (float) $bank_setting->amount;
+                    $after_amount = round($prev_amount - $amount, 2);
 
-                    $stock->stock_logs()->create([
+                    $type = 'stock_out';
+
+                    $bank_setting->bank_logs()->create([
                         'bank_setting_id' => $bank_setting->id,
                         'order_id'        => $order->id,
-                        'idr_amount'      => $take,
-                        'stock_idr_rate'  => $stock->idr_rate,
-                        'capital_used'    => round($take / $stock->idr_rate, 2),
+                        'type'            => $type,
+                        'remarks'         => 'Order ' . $order->order_no,
+                        'prev_amount'     => $prev_amount,
+                        'amount'          => abs($amount),
+                        'after_amount'    => $after_amount,
                     ]);
 
-                    $stock->update([
-                        'idr_balance' => $stock->idr_balance - $take,
+                    $bank_setting->update([
+                        'amount' => $after_amount,
                     ]);
 
-                    $totalDeducted += $take;
-                    $qty_needed -= $take;
-                }
+                    $capital_used = $order->stock_logs()->sum('capital_used');
+                    $profit = $amount_received - $capital_used;
+                    $order->profit()->create([
+                        'amount_received' => $amount_received,
+                        'capital_used'    => $capital_used,
+                        'profit'          => $profit,
+                    ]);
+                });
+            } catch (\Exception $e) {
+                return back()->withErrors($e->getMessage());
+            }
 
-                $amount       = (float) $totalDeducted;
-                $prev_amount  = (float) $bank_setting->amount;
-                $after_amount = round($prev_amount - $amount, 2);
+        } elseif ($request->status == 'cancelled') {
 
-                $type = 'stock_out';
+            try {
+                DB::transaction(function () use ($request, $order) {
+                    // Update order
+                    $order->update([
+                        'status'          => $request->status,
+                        'status_at'       => now(),
+                        'status_by_id'    => Auth::id(),
+                        'bank_setting_id' => null,
+                        'remarks'         => $request->remarks,
+                    ]);
 
-                $bank_setting->bank_logs()->create([
-                    'bank_setting_id' => $bank_setting->id,
-                    'order_id'        => $order->id,
-                    'type'            => $type,
-                    'remarks'         => 'Order ' . $order->order_no,
-                    'prev_amount'     => $prev_amount,
-                    'amount'          => abs($amount),
-                    'after_amount'    => $after_amount,
+                    // Receipt upload
+                    if ($request->hasFile('receipt')) {
+                        $upload = $this->upload($request->receipt, 'receipt', $order->id);
+
+                        $order->file_attachments()->create([
+                            'file_name' => $upload['file_name'],
+                            'file_path' => $upload['file_path'],
+                            'file_type' => $upload['file_type'],
+                        ]);
+                    }
+
+                    $user = $order->user;
+                    $point_before = $user->point;
+                    $refund_amount = $order->myr_amount;
+                    $point_after = round($point_before + $refund_amount, 2);
+
+                    PointHistory::create([
+                        'agent_id' => $user->id,
+                        'point_before' => $point_before,
+                        'point' => $refund_amount,
+                        'point_after' => $point_after,
+                        'description' => 'Cancel Order ' . $order->order_no . ' (Refunded)'
+                    ]);
+
+                    $user->update(['point' => $point_after]);
+                });
+            } catch (\Exception $e) {
+                return back()->withErrors($e->getMessage());
+            }
+        } else {
+
+            // Update order
+            if ($request->status) {
+                $request->merge([
+                    'status_at'       => now(),
+                    'status_by_id'    => Auth::id(),
                 ]);
+            }
 
-                $bank_setting->update([
-                    'amount' => $after_amount,
-                ]);
+            $order->update($request->all());
 
-                $capital_used = $order->stock_logs()->sum('capital_used');
-                $profit = $amount_received - $capital_used;
-                $order->profit()->create([
-                    'amount_received' => $amount_received,
-                    'capital_used'    => $capital_used,
-                    'profit'          => $profit,
+            // Receipt upload
+            if ($request->hasFile('receipt')) {
+                $upload = $this->upload($request->receipt, 'receipt', $order->id);
+
+                $order->file_attachments()->create([
+                    'file_name' => $upload['file_name'],
+                    'file_path' => $upload['file_path'],
+                    'file_type' => $upload['file_type'],
                 ]);
-            });
-        } catch (\Exception $e) {
-            return back()->withErrors($e->getMessage());
+            }
         }
 
-        return redirect()->route('order.index')->withSuccess('Data updated');
+        return redirect()->route('order.view_details', $order)->withSuccess('Data updated');
     }
 }

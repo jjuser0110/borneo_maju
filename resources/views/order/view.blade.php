@@ -99,7 +99,7 @@
                             <li class="d-flex align-items-center mb-3">
                                 <i class="bx bx-check bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.status') }}:</span>
                                 <span style="width:100%">
-                                    @if(isset($view) && $view)
+                                    @if((isset($view) && $view) || in_array($order->status, ['completed', 'cancelled']))
                                         {{ $order->status ?? '' }}
                                     @else
                                         <select class="form-control" name="status">
@@ -121,10 +121,11 @@
                             </li>
                             <li class="d-flex align-items-center mb-3">
                                 <i class="bx bx-user bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.bank') }}:</span>
-                                @if(isset($view) && $view)
+                                @if((isset($view) && $view) || in_array($order->status, ['completed', 'cancelled']))
                                     <span>{{ $order->bankSetting->owner_name ?? '' }}</span>
                                 @else
                                     <select class="form-control" name="bank_setting_id">
+                                        <option value="">-- Select Bank --</option>
                                         @foreach ($bankSettings as $bankSetting)
                                             <option value="{{ $bankSetting->id }}" {{ $order->bank_setting_id == $bankSetting->id ? 'checked' : '' }}>{{ $bankSetting->owner_name }} (IDR {{ number_format($bankSetting->amount) }})</option>
                                         @endforeach
