@@ -171,4 +171,5 @@ return [
     'stock_out' => 'Stock Out',
     'capital_used' => 'Capital Used',
     'amount_received' => 'Amount Received',
+    'print' => 'Print',
 ];

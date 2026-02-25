@@ -171,4 +171,5 @@ return [
     'stock_out' => 'Stok Tolak',
     'capital_used' => 'Jumlah Digunakan',
     'amount_received' => 'Jumlah Terima',
+    'print' => 'Cetak',
 ];

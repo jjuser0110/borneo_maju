@@ -171,4 +171,5 @@ return [
     'stock_out' => '库存减少',
     'capital_used' => '使用本金',
     'amount_received' => '收到金额',
+    'print' => '打印',
 ];

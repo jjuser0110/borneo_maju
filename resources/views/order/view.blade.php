@@ -1,5 +1,34 @@
 @extends('layouts.app')
 @section('content')
+<style>
+    @media print {
+
+        /* Hide everything first */
+        body * {
+            visibility: hidden;
+        }
+
+        /* Only show printable area */
+        #printableArea, #printableArea * {
+            visibility: visible;
+        }
+
+        /* Position printable area properly */
+        #printableArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            font-size: 12px; /* smaller font */
+        }
+
+        /* Hide button */
+        .no-print {
+            display: none !important;
+        }
+
+    }
+</style>
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="py-3 breadcrumb-wrapper mb-4">
         <span class="">{{ $order->order_no ?? '' }}</span>
@@ -8,8 +37,19 @@
     <div class="row">
         <div class="col-xl-6 col-lg-6 col-md-6">
             <!-- About User -->
-            <div class="card mb-4">
+            <div class="card mb-4" id="printableArea">
                 <div class="card-body">
+                    <div class="dt-buttons">
+                        <a class="dt-button create-new btn btn-primary no-print" 
+                        type="button" 
+                        style="float:right;color:white" 
+                        onclick="printDiv()">
+                            <span>
+                                <i class="bx bx-printer me-sm-1"></i>
+                                <span class="d-none d-sm-inline-block">{{ __('sidebar.print') }}</span>
+                            </span>
+                        </a>
+                    </div>
                     <p class="card-text text-uppercase">{{ __('sidebar.details') }}</p>
                     <ul class="list-unstyled mb-4">
                         <li class="d-flex align-items-center mb-3">
@@ -224,5 +264,9 @@ $(function(){
     lengthChange: false
   });
 });
+
+function printDiv() {
+    window.print();
+}
 </script>
 @endsection
