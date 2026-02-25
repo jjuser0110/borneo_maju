@@ -163,7 +163,8 @@ class ReportController extends Controller
             ->sum('idr_amount');
 
         $orders = Order::where('status_at', '>=', $date_from)
-            ->where('status_at', '<=', $date_to);
+            ->where('status_at', '<=', $date_to)
+            ->where('status', 'completed');
 
         $stock_out = $orders->sum('idr_amount');
 
