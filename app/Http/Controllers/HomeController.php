@@ -49,7 +49,7 @@ class HomeController extends Controller
             ? Carbon::parse($request->date_to)->endOfDay()
             : Carbon::now()->endOfDay();
 
-        $today_order = Order::whereBetween('created_at', [$date_from, $date_to])->get();
+        $today_order = Order::whereBetween('created_at', [$date_from, $date_to])->where('status', 'completed')->get();
         $order_count = $today_order->count();
         $total_idr_amount = $today_order->sum('idr_amount');
 
