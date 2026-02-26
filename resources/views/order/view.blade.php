@@ -4,30 +4,69 @@
 @media print {
 
     @page {
-        size: auto;
+        size: 58mm auto;   /* VERY IMPORTANT for JK-5802P */
         margin: 0;
     }
 
     html, body {
-        margin: 0 !important;
-        padding: 0 !important;
+        width: 58mm;
+        margin: 0;
+        padding: 0;
+        font-family: monospace; /* thermal printer friendly */
+        font-size: 12px;
     }
 
-    body {
-        -webkit-print-color-adjust: exact;
+    body * {
+        visibility: hidden;
     }
 
-    /* Instead of hiding everything */
-    body > *:not(#printableArea) {
-        display: none !important;
+    #printableArea, #printableArea * {
+        visibility: visible;
     }
 
     #printableArea {
-        display: block !important;
-        width: 100% !important;
-        position: static !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
     }
 
+    .no-print {
+        display: none !important;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+
+    table th, table td {
+        padding: 2px 0;
+        word-break: break-word;
+    }
+
+    hr {
+        border: none;
+        border-top: 1px dashed #000;
+        margin: 4px 0;
+    }
+
+    .col-xl-6,
+    .col-lg-6,
+    .col-md-6,
+    .col-12 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
 }
 </style>
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -38,37 +77,7 @@
     <div class="row">
         <div class="col-xl-6 col-lg-6 col-md-6">
             <!-- About User -->
-            <div class="card mb-4">
-                <div id="printableArea" style="display:none;">
-                    <div class="receipt">
-
-                        <div class="center">
-                            <strong>Borneo Maju</strong><br>
-                            Order No: {{ $order->order_no }}<br>
-                            Date: {{ $order->created_at }}<br>
-                        </div>
-
-                        <div class="line"></div>
-
-                        User: {{ $order->user->username }}<br>
-                        Bank: {{ $order->bank->bank_name }}<br>
-                        Account: {{ $order->account_no }}<br>
-
-                        <div class="line"></div>
-
-                        MYR: {{ number_format($order->myr_amount,2) }}<br>
-                        IDR Rate: {{ $order->idr_rate }}<br>
-                        IDR: {{ number_format($order->idr_amount) }}<br>
-                        Fees: {{ number_format($order->processing_fees,2) }}<br>
-
-                        <div class="line"></div>
-
-                        <div class="center">
-                            THANK YOU
-                        </div>
-
-                    </div>
-                </div>
+            <div class="card mb-4" id="printableArea">
                 <div class="card-body">
                     <div class="dt-buttons">
                         <a class="dt-button create-new btn btn-primary no-print" 
@@ -281,7 +290,6 @@
         @endif
     </div>
 </div>
-
 @endsection
 @section('page-js')
 @endsection
@@ -299,9 +307,7 @@ $(function(){
 });
 
 function printDiv() {
-    document.getElementById('printableArea').style.display = 'block';
     window.print();
-    document.getElementById('printableArea').style.display = 'none';
 }
 </script>
 @endsection
