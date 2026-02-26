@@ -288,6 +288,10 @@ $(function(){
 });
 
 function printDiv() {
+    let printable = document.getElementById("printableArea");
+    let scale = window.innerWidth / printable.offsetWidth;
+    printable.style.transform = "scale(" + scale + ")";
+    printable.style.transformOrigin = "top left";
     window.print();
 }
 </script>
