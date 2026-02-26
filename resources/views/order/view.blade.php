@@ -2,62 +2,45 @@
 @section('content')
 <style>
 @media print {
-    /* Hide everything else */
     body * {
         visibility: hidden;
     }
 
-    /* Show only printable area */
     #printableArea, #printableArea * {
         visibility: visible;
     }
 
-    /* Make printable area take full width */
     #printableArea {
         position: absolute;
         left: 0;
         top: 0;
         width: 100%;
-        padding: 10px;
-        font-size: 14pt; /* readable on print */
-        line-height: 1.5;
-        font-weight: bold; /* strong text */
+        padding: 5px;
+        font-size: 18pt;       /* bigger text */
+        line-height: 1.6;      /* more spacing */
+        font-weight: bold;     /* strong text */
         color: #000;
+        font-family: monospace; /* makes receipt look uniform */
+        word-wrap: break-word;
     }
 
-    /* Make lists, tables fit */
-    #printableArea ul,
-    #printableArea ol,
-    #printableArea table {
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        border-collapse: collapse;
-        page-break-inside: avoid;
+    /* Lists and table formatting */
+    #printableArea ul {
+        padding-left: 0;
+        list-style: none;
     }
 
-    #printableArea table th,
-    #printableArea table td {
-        border: 1px solid #000;
-        padding: 6px;
-        font-size: 12pt; /* larger for mobile printing */
-        word-break: break-word;
+    #printableArea li {
+        margin-bottom: 5px;
     }
 
-    /* Force page break after table if needed */
-    #printableArea table {
-        page-break-after: auto;
-    }
-
-    /* Hide print button */
     .no-print {
         display: none !important;
     }
 
-    /* Prevent scaling issues on mobile */
     @page {
-        size: auto;   /* use printer default size */
-        margin: 10mm; /* small margins */
+        size: auto;
+        margin: 5mm;
     }
 }
 </style>
