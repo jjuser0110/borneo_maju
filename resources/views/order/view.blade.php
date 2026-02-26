@@ -2,56 +2,62 @@
 @section('content')
 <style>
 @media print {
-
-    @page {
-        size: 58mm auto;
-        margin: 0;
-    }
-
-    html, body {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        font-family: 'Courier New', monospace;
-        font-size: 14px; /* bigger text */
-    }
-
+    /* Hide everything else */
     body * {
         visibility: hidden;
     }
 
+    /* Show only printable area */
     #printableArea, #printableArea * {
         visibility: visible;
     }
 
+    /* Make printable area take full width */
     #printableArea {
         position: absolute;
         left: 0;
         top: 0;
-        width: 100% !important;
-        padding: 8px;
-        box-sizing: border-box;
+        width: 100%;
+        padding: 10px;
+        font-size: 14pt; /* readable on print */
+        line-height: 1.5;
+        font-weight: bold; /* strong text */
+        color: #000;
     }
 
-    .card {
-        box-shadow: none !important;
-        border: none !important;
+    /* Make lists, tables fit */
+    #printableArea ul,
+    #printableArea ol,
+    #printableArea table {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border-collapse: collapse;
+        page-break-inside: avoid;
     }
 
+    #printableArea table th,
+    #printableArea table td {
+        border: 1px solid #000;
+        padding: 6px;
+        font-size: 12pt; /* larger for mobile printing */
+        word-break: break-word;
+    }
+
+    /* Force page break after table if needed */
+    #printableArea table {
+        page-break-after: auto;
+    }
+
+    /* Hide print button */
     .no-print {
         display: none !important;
     }
 
-    h4 {
-        font-size: 16px;
-        text-align: center;
-    }
-
-    .row, .col-xl-6, .col-lg-6, .col-md-6, .col-12 {
-        width: 100% !important;
-        max-width: 100% !important;
-        flex: 0 0 100% !important;
+    /* Prevent scaling issues on mobile */
+    @page {
+        size: auto;   /* use printer default size */
+        margin: 10mm; /* small margins */
     }
 }
 </style>
