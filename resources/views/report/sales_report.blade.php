@@ -133,7 +133,11 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><a href="{{ route('order.index',['date_from'=>$date_from,'date_to'=>$date_to]) }}" target="__blank">{{ $my_order->count() ?? 0 }}</a></td>
+                            @if($my_order->count()>0)
+                            <td><a href="{{ route('order.index',['user_id'=>$my_order->first()->user_id??'','date_from'=>$date_from,'date_to'=>$date_to]) }}" target="__blank">{{ $my_order->count() ?? 0 }}</a></td>
+                            @else
+                            <td>{{ $my_order->count() ?? 0 }}</td>
+                            @endif
                             <td>IDR {{ number_format($my_order->sum('idr_amount') ?? 0, 2) }}</td>
                             <td>MYR {{ number_format($my_order->sum('myr_amount') ?? 0, 2) }}</td>
                             <td>MYR {{ number_format($my_order->sum('processing_fees') ?? 0, 2) }}</td>

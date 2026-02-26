@@ -20,6 +20,14 @@
                             <input type="date" class="form-control" name="date_from" value="{{ $date_from ?? '' }}"/>
                             <span class="input-group-text">{{ __('sidebar.to') }}</span>
                             <input type="date" class="form-control" name="date_to" value="{{ $date_to ?? '' }}"/>
+                            @if(Auth::user()->role_id != 3)
+                            <select name="user_id" class="form-select">
+                                <option value="">{{ __('sidebar.all_agents') }}</option>
+                                @foreach($agent as $row)
+                                    <option value="{{ $row->id }}" {{ (isset($user_id) && $user_id == $row->id) ? 'selected' : '' }}>{{ $row->username }}</option>
+                                @endforeach
+                            </select>
+                            @endif
                             <button class="btn btn-primary" type="submit">{{ __('sidebar.filter') }}</button>
                         </div>
                     </form>

@@ -172,4 +172,5 @@ return [
     'capital_used' => '使用本金',
     'amount_received' => '收到金额',
     'print' => '打印',
+    'all_agents' => '所有代理',
 ];

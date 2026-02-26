@@ -125,6 +125,7 @@ class ReportController extends Controller
                         ->where('status', 'completed');
                     })->sum('do_up') ?? 0;
         $earning = $total_collected - $total_do_up;
+        // dd($my_order);
         return view('report.sales_report', [
             'agents'     => $agents,
             'my_order'   => $my_order,

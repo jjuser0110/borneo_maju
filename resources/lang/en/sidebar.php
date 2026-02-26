@@ -172,4 +172,5 @@ return [
     'capital_used' => 'Capital Used',
     'amount_received' => 'Amount Received',
     'print' => 'Print',
+    'all_agents' => 'All Agents',
 ];

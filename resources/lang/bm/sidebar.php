@@ -172,4 +172,5 @@ return [
     'capital_used' => 'Jumlah Digunakan',
     'amount_received' => 'Jumlah Terima',
     'print' => 'Cetak',
+    'all_agents' => 'Semua Ejen',
 ];

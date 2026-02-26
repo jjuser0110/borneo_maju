@@ -34,13 +34,20 @@ class OrderController extends Controller
 
         $loginUser = Auth::user();
         if($loginUser->role_id!=3){
-            $order = Order::whereBetween('order_datetime', [$date_from, $date_to])->get();
+            if($request->user_id > 0) {
+                $order = Order::where('user_id', $request->user_id)->whereBetween('order_datetime', [$date_from, $date_to])->get();
+            } else {
+                $order = Order::whereBetween('order_datetime', [$date_from, $date_to])->get();
+            }
         }else{
             $order = Order::where('user_id', $loginUser->id)->whereBetween('order_datetime', [$date_from, $date_to])->get();
         }
+        $agent = User::where('role_id', 3)->get();
 
         return view('order.index', [
             'order'    => $order,
+            'agent'    => $agent,
+            'user_id' => $request->user_id,
             'date_from' => $date_from->format('Y-m-d'),
             'date_to'   => $date_to->format('Y-m-d'),
         ]);
