@@ -1,43 +1,33 @@
 @extends('layouts.app')
 @section('content')
 <style>
-.receipt {
-    width: 58mm;
-    font-size: 11px;
-    font-family: monospace;
-}
-
-.center {
-    text-align: center;
-}
-
-.line {
-    border-top: 1px dashed #000;
-    margin: 5px 0;
-}
-
 @media print {
 
     @page {
-        size: 58mm auto;
+        size: auto;
         margin: 0;
     }
 
-    body * {
-        visibility: hidden;
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
-    #printableArea,
-    #printableArea * {
-        visibility: visible;
+    body {
+        -webkit-print-color-adjust: exact;
+    }
+
+    /* Instead of hiding everything */
+    body > *:not(#printableArea) {
+        display: none !important;
     }
 
     #printableArea {
-        display: block;
-        position: absolute;
-        left: 0;
-        top: 0;
+        display: block !important;
+        width: 100% !important;
+        position: static !important;
     }
+
 }
 </style>
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -309,9 +299,33 @@ $(function(){
 });
 
 function printDiv() {
-    document.getElementById('printableArea').style.display = 'block';
-    window.print();
-    document.getElementById('printableArea').style.display = 'none';
+    var content = document.getElementById("printableArea").innerHTML;
+
+    var myWindow = window.open('', '', 'width=400,height=600');
+
+    myWindow.document.write(`
+        <html>
+        <head>
+            <title>Print</title>
+            <style>
+                body {
+                    font-family: monospace;
+                    font-size: 12px;
+                    margin: 0;
+                    padding: 10px;
+                }
+            </style>
+        </head>
+        <body>
+            ${content}
+        </body>
+        </html>
+    `);
+
+    myWindow.document.close();
+    myWindow.focus();
+    myWindow.print();
+    myWindow.close();
 }
 </script>
 @endsection
