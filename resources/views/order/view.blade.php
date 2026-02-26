@@ -17,7 +17,7 @@
         width: 100%;
         padding: 5px 5px 20px 5px; /* extra bottom padding */
         font-size: 18pt;           /* bigger text */
-        line-height: 1.6;
+        line-height: 1;
         font-weight: bold;
         color: #000;
         font-family: monospace;    /* aligns numbers nicely */
