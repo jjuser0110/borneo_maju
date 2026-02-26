@@ -49,6 +49,36 @@
         <div class="col-xl-6 col-lg-6 col-md-6">
             <!-- About User -->
             <div class="card mb-4">
+                <div id="printableArea" style="display:none;">
+                    <div class="receipt">
+
+                        <div class="center">
+                            <strong>Borneo Maju</strong><br>
+                            Order No: {{ $order->order_no }}<br>
+                            Date: {{ $order->created_at }}<br>
+                        </div>
+
+                        <div class="line"></div>
+
+                        User: {{ $order->user->username }}<br>
+                        Bank: {{ $order->bank->bank_name }}<br>
+                        Account: {{ $order->account_no }}<br>
+
+                        <div class="line"></div>
+
+                        MYR: {{ number_format($order->myr_amount,2) }}<br>
+                        IDR Rate: {{ $order->idr_rate }}<br>
+                        IDR: {{ number_format($order->idr_amount) }}<br>
+                        Fees: {{ number_format($order->processing_fees,2) }}<br>
+
+                        <div class="line"></div>
+
+                        <div class="center">
+                            THANK YOU
+                        </div>
+
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="dt-buttons">
                         <a class="dt-button create-new btn btn-primary no-print" 
@@ -261,36 +291,7 @@
         @endif
     </div>
 </div>
-<div id="printableArea" style="display:none;">
-    <div class="receipt">
 
-        <div class="center">
-            <strong>YOUR COMPANY NAME</strong><br>
-            Order No: {{ $order->order_no }}<br>
-            Date: {{ $order->created_at }}<br>
-        </div>
-
-        <div class="line"></div>
-
-        User: {{ $order->user->username }}<br>
-        Bank: {{ $order->bank->bank_name }}<br>
-        Account: {{ $order->account_no }}<br>
-
-        <div class="line"></div>
-
-        MYR: {{ number_format($order->myr_amount,2) }}<br>
-        IDR Rate: {{ $order->idr_rate }}<br>
-        IDR: {{ number_format($order->idr_amount) }}<br>
-        Fees: {{ number_format($order->processing_fees,2) }}<br>
-
-        <div class="line"></div>
-
-        <div class="center">
-            THANK YOU
-        </div>
-
-    </div>
-</div>
 @endsection
 @section('page-js')
 @endsection
