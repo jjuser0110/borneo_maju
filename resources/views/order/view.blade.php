@@ -4,50 +4,50 @@
 @media print {
 
     @page {
-        size: auto;   /* Let printer decide */
+        size: auto;      /* auto detect paper size */
+        margin: 5mm;     /* small margin */
+    }
+
+    body {
         margin: 0;
+        padding: 0;
     }
 
-    html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
+    /* Hide everything first */
     body * {
         visibility: hidden;
     }
 
+    /* Show only printable area */
     #printableArea, #printableArea * {
         visibility: visible;
     }
 
+    /* Auto fit width */
     #printableArea {
         position: absolute;
         left: 0;
         top: 0;
-        width: 100%;
+        width: 100%;       /* FULL WIDTH of paper */
         max-width: 100%;
         box-sizing: border-box;
-        padding: 10px;
-        font-size: 12px;
-        word-wrap: break-word;
-    }
-
-    img {
-        max-width: 100%;
-        height: auto;
-    }
-
-    table {
-        width: 100% !important;
-        table-layout: fixed;
-        word-wrap: break-word;
     }
 
     .no-print {
         display: none !important;
     }
 
+    /* Make content responsive */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
 }
 </style>
 <div class="container-xxl flex-grow-1 container-p-y">
