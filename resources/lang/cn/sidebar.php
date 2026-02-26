@@ -125,7 +125,7 @@ return [
     'order_no'         => '订单号',
     'user'             => '用户',
     'order_date'       => '订单日期',
-    'order_full_date'  => '完整订单日期',
+    'order_full_date'  => '创建时间',
     'bank_info'        => '银行信息',
     'account_no'       => '账号',
     'fullname'         => '全名',

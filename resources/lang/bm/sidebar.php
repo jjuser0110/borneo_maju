@@ -125,7 +125,7 @@ return [
     'order_no'         => 'No. Pesanan',
     'user'             => 'Pengguna',
     'order_date'       => 'Tarikh Pesanan',
-    'order_full_date'  => 'Tarikh Penuh Pesanan',
+    'order_full_date'  => 'Tarikh Dicipta',
     'bank_info'        => 'Maklumat Bank',
     'account_no'       => 'No Akaun',
     'fullname'         => 'Nama Penuh',

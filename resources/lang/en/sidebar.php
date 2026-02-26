@@ -125,7 +125,7 @@ return [
     'order_no'         => 'Order No',
     'user'             => 'User',
     'order_date'       => 'Order Date',
-    'order_full_date'  => 'Order Full Date',
+    'order_full_date'  => 'Created At',
     'bank_info'        => 'Banks',
     'account_no'       => 'Account No',
     'fullname'         => 'Fullname',
