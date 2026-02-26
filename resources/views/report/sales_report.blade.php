@@ -133,7 +133,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{{ $my_order->count() ?? 0 }}</td>
+                            <td><a href="{{ route('order.index',['date_from'=>$date_from,'date_to'=>$date_to]) }}" target="__blank">{{ $my_order->count() ?? 0 }}</a></td>
                             <td>IDR {{ number_format($my_order->sum('idr_amount') ?? 0, 2) }}</td>
                             <td>MYR {{ number_format($my_order->sum('myr_amount') ?? 0, 2) }}</td>
                             <td>MYR {{ number_format($my_order->sum('processing_fees') ?? 0, 2) }}</td>

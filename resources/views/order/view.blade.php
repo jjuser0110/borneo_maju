@@ -174,10 +174,10 @@
                             </li>
                             <li class="d-flex align-items-center mb-3">
                                 <i class="bx bx-user bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.remarks') }}:</span>
-                                @if(isset($view) && $view)
-                                    <span style="width:100%">{{ $order->remarks ?? '' }}</span>
-                                @else
+                                @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
                                     <span style="width:100%"><textarea class="form-control" name="remarks">{{ $order->remarks ?? '' }}</textarea></span>
+                                @else
+                                    <span style="width:100%">{{ $order->remarks ?? '' }}</span>
                                 @endif
                             </li>
                             <li class="d-flex align-items-center mb-3">
@@ -188,7 +188,7 @@
                                         <a style="color:red" onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){window.location.href='{{ route('removeimage',$order->last_image->id) }}'}"><i class="bx bx-trash"></i></a>
                                     @endif
                                 @else
-                                    @if(!isset($view) || !$view)
+                                    @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
                                         <span style="width:100%"><input type="file" class="form-control" name="receipt" accept="image/*,application/pdf"></span>
                                     @else
                                         -
@@ -196,7 +196,8 @@
                                 @endif
                             </li>
                         </ul>
-                        @if(!isset($view) || !$view)
+                        
+                        @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
                             <button type="submit" class="btn btn-primary mt-3" style="float:right">{{ __('sidebar.update_order') }}</button>
                         @endif
                     </form>

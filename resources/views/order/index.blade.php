@@ -66,11 +66,11 @@
                             <td>{{$row->bank->bank_name??""}}</td>
                             <td>{{$row->account_no??""}}</td>
                             <td>{{$row->fullname??""}}</td>
-                            <td>{{$row->idr_rate??""}}</td>
-                            <td>{{number_format($row->myr_amount, 2)}}</td>
-                            <td>{{number_format($row->idr_amount)}}</td>
-                            <td>{{number_format($row->processing_fees, 2)}}</td>
-                            <td>{{number_format($row->total_amount, 2)}}</td>
+                            <td style="text-align:center">{{$row->idr_rate??""}}</td>
+                            <td style="text-align:right">{{number_format($row->myr_amount, 2)}}</td>
+                            <td style="text-align:right">{{number_format($row->idr_amount)}}</td>
+                            <td style="text-align:right">{{number_format($row->processing_fees, 2)}}</td>
+                            <td style="text-align:right">{{number_format($row->total_amount, 2)}}</td>
                             <td>{{$row->status??""}}</td>
                             <td>
                                 <a href="{{ route('order.view_details',$row) }}" onclick="showLoading()"><i class="fa-solid fa-eye"></i></a>
@@ -82,6 +82,15 @@
                         </tr>
                         @endforeach
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="8" style="text-align:right">Total</th>
+                            <th style="text-align:right">{{number_format($order->sum('myr_amount'), 2)}}</th>
+                            <th style="text-align:right">{{number_format($order->sum('idr_amount'))}}</th>
+                            <th style="text-align:right">{{number_format($order->sum('processing_fees'), 2)}}</th>
+                            <th style="text-align:right">{{number_format($order->sum('total_amount'), 2)}}</th>
+                            <th colspan="2"></th>
+                        </tr>
                 </table>
             </div>
         </div>
