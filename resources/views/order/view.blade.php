@@ -4,16 +4,13 @@
 @media print {
 
     @page {
-        size: 58mm auto;   /* 58mm paper width */
+        size: auto;   /* Let printer decide */
         margin: 0;
     }
 
-    body {
-        margin: 0;
-        padding: 0;
-        width: 58mm;
-        font-size: 11px;
-        font-family: monospace; /* better for receipt */
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     body * {
@@ -28,38 +25,27 @@
         position: absolute;
         left: 0;
         top: 0;
-        width: 58mm;
-        padding: 5px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        font-size: 12px;
+        word-wrap: break-word;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    table {
+        width: 100% !important;
+        table-layout: fixed;
+        word-wrap: break-word;
     }
 
     .no-print {
         display: none !important;
-    }
-
-    .card {
-        border: none !important;
-        box-shadow: none !important;
-    }
-
-    ul {
-        padding-left: 0;
-        margin: 0;
-    }
-
-    li {
-        font-size: 11px;
-        margin-bottom: 4px;
-    }
-
-    table {
-        width: 100%;
-        font-size: 10px;
-        border-collapse: collapse;
-    }
-
-    table th, table td {
-        padding: 2px 0;
-        font-size: 10px;
     }
 
 }
