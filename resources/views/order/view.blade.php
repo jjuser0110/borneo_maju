@@ -4,16 +4,17 @@
 @media print {
 
     @page {
-        size: 58mm auto;   /* VERY IMPORTANT for JK-5802P */
+        size: 58mm auto;
         margin: 0;
     }
 
     html, body {
-        width: 58mm;
-        margin: 0;
-        padding: 0;
-        font-family: monospace; /* thermal printer friendly */
-        font-size: 12px;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-family: 'Courier New', monospace;
+        font-size: 14px; /* bigger text */
     }
 
     body * {
@@ -28,44 +29,29 @@
         position: absolute;
         left: 0;
         top: 0;
-        width: 100%;
-        padding: 5px;
+        width: 100% !important;
+        padding: 8px;
         box-sizing: border-box;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: none !important;
     }
 
     .no-print {
         display: none !important;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 11px;
+    h4 {
+        font-size: 16px;
+        text-align: center;
     }
 
-    table th, table td {
-        padding: 2px 0;
-        word-break: break-word;
-    }
-
-    hr {
-        border: none;
-        border-top: 1px dashed #000;
-        margin: 4px 0;
-    }
-
-    .col-xl-6,
-    .col-lg-6,
-    .col-md-6,
-    .col-12 {
+    .row, .col-xl-6, .col-lg-6, .col-md-6, .col-12 {
         width: 100% !important;
         max-width: 100% !important;
         flex: 0 0 100% !important;
-    }
-
-    .card {
-        border: none !important;
-        box-shadow: none !important;
     }
 }
 </style>
