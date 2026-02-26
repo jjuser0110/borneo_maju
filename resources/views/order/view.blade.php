@@ -299,33 +299,9 @@ $(function(){
 });
 
 function printDiv() {
-    var content = document.getElementById("printableArea").innerHTML;
-
-    var myWindow = window.open('', '', 'width=400,height=600');
-
-    myWindow.document.write(`
-        <html>
-        <head>
-            <title>Print</title>
-            <style>
-                body {
-                    font-family: monospace;
-                    font-size: 12px;
-                    margin: 0;
-                    padding: 10px;
-                }
-            </style>
-        </head>
-        <body>
-            ${content}
-        </body>
-        </html>
-    `);
-
-    myWindow.document.close();
-    myWindow.focus();
-    myWindow.print();
-    myWindow.close();
+    document.getElementById('printableArea').style.display = 'block';
+    window.print();
+    document.getElementById('printableArea').style.display = 'none';
 }
 </script>
 @endsection
