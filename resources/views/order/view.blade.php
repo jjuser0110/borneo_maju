@@ -15,13 +15,20 @@
         left: 0;
         top: 0;
         width: 100%;
-        padding: 5px;
-        font-size: 18pt;       /* bigger text */
-        line-height: 1.6;      /* more spacing */
-        font-weight: bold;     /* strong text */
+        padding: 5px 5px 20px 5px; /* extra bottom padding */
+        font-size: 18pt;           /* bigger text */
+        line-height: 1.6;
+        font-weight: bold;
         color: #000;
-        font-family: monospace; /* makes receipt look uniform */
+        font-family: monospace;    /* aligns numbers nicely */
         word-wrap: break-word;
+    }
+
+    #printableArea .company-name {
+        text-align: center;
+        font-size: 20pt;           /* slightly bigger for company */
+        margin-bottom: 10px;
+        font-weight: bold;
     }
 
     /* Lists and table formatting */
@@ -54,6 +61,8 @@
             <!-- About User -->
             <div class="card mb-4" id="printableArea">
                 <div class="card-body">
+                    <div class="company-name">BORNEO MAJU</div>
+                    <hr>
                     <div class="dt-buttons">
                         <a class="dt-button create-new btn btn-primary no-print" 
                         type="button" 
