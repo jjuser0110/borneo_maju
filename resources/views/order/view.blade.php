@@ -58,7 +58,7 @@
                         </li>
                         <li class="d-flex align-items-center mb-3">
                             <i class="bx bx-user bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.user') }}:</span>
-                            <span>{{ $order->user->name ?? '' }}</span>
+                            <span>{{ $order->user->username ?? '' }}</span>
                         </li>
                         <li class="d-flex align-items-center mb-3">
                             <i class="bx bx-star bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.order_date') }}:</span>
