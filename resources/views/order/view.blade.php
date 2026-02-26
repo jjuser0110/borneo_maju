@@ -1,52 +1,42 @@
 @extends('layouts.app')
 @section('content')
 <style>
+.receipt {
+    width: 58mm;
+    font-size: 11px;
+    font-family: monospace;
+}
+
+.center {
+    text-align: center;
+}
+
+.line {
+    border-top: 1px dashed #000;
+    margin: 5px 0;
+}
+
 @media print {
 
     @page {
-        size: auto;      /* auto detect paper size */
-        margin: 5mm;     /* small margin */
-    }
-
-    body {
+        size: 58mm auto;
         margin: 0;
-        padding: 0;
     }
 
-    /* Hide everything first */
     body * {
         visibility: hidden;
     }
 
-    /* Show only printable area */
-    #printableArea, #printableArea * {
+    #printableArea,
+    #printableArea * {
         visibility: visible;
     }
 
-    /* Auto fit width */
     #printableArea {
+        display: block;
         position: absolute;
         left: 0;
         top: 0;
-        width: 100%;       /* FULL WIDTH of paper */
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-
-    .no-print {
-        display: none !important;
-    }
-
-    /* Make content responsive */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 12px;
-    }
-
-    img {
-        max-width: 100%;
-        height: auto;
     }
 }
 </style>
@@ -58,7 +48,7 @@
     <div class="row">
         <div class="col-xl-6 col-lg-6 col-md-6">
             <!-- About User -->
-            <div class="card mb-4" id="printableArea">
+            <div class="card mb-4">
                 <div class="card-body">
                     <div class="dt-buttons">
                         <a class="dt-button create-new btn btn-primary no-print" 
@@ -271,6 +261,36 @@
         @endif
     </div>
 </div>
+<div id="printableArea" style="display:none;">
+    <div class="receipt">
+
+        <div class="center">
+            <strong>YOUR COMPANY NAME</strong><br>
+            Order No: {{ $order->order_no }}<br>
+            Date: {{ $order->created_at }}<br>
+        </div>
+
+        <div class="line"></div>
+
+        User: {{ $order->user->username }}<br>
+        Bank: {{ $order->bank->bank_name }}<br>
+        Account: {{ $order->account_no }}<br>
+
+        <div class="line"></div>
+
+        MYR: {{ number_format($order->myr_amount,2) }}<br>
+        IDR Rate: {{ $order->idr_rate }}<br>
+        IDR: {{ number_format($order->idr_amount) }}<br>
+        Fees: {{ number_format($order->processing_fees,2) }}<br>
+
+        <div class="line"></div>
+
+        <div class="center">
+            THANK YOU
+        </div>
+
+    </div>
+</div>
 @endsection
 @section('page-js')
 @endsection
@@ -288,11 +308,9 @@ $(function(){
 });
 
 function printDiv() {
-    let printable = document.getElementById("printableArea");
-    let scale = window.innerWidth / printable.offsetWidth;
-    printable.style.transform = "scale(" + scale + ")";
-    printable.style.transformOrigin = "top left";
+    document.getElementById('printableArea').style.display = 'block';
     window.print();
+    document.getElementById('printableArea').style.display = 'none';
 }
 </script>
 @endsection
