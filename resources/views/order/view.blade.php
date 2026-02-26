@@ -183,7 +183,7 @@
                             <li class="d-flex align-items-center mb-3">
                                 <i class="bx bx-user bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.receipt') }}:</span>
                                 @if(isset($order) && isset($order->last_image))
-                                    <a href="{{ asset('storage/'.$order->last_image->file_path) }}">{{ $order->last_image->file_name ?? '' }}</a>
+                                    <a href="{{ asset('storage/'.$order->last_image->file_path) }}" target="_blank">{{ $order->last_image->file_name ?? '' }}</a>
                                     @if(!isset($view) || !$view)
                                         <a style="color:red" onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){window.location.href='{{ route('removeimage',$order->last_image->id) }}'}"><i class="bx bx-trash"></i></a>
                                     @endif
