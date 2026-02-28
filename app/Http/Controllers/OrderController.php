@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\PointHistory;
 use App\Models\OrderDetail;
 use App\Models\User;
+use App\Models\Cost;
 use Bouncer;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -69,8 +70,9 @@ class OrderController extends Controller
             $order->update(['status'=>'processing']);
         }
         $bankSettings = BankSetting::where('is_active', 1)->get();
+        $cost = Cost::all();
 
-        return view('order.view')->with('order',$order)->with('bankSettings', $bankSettings);
+        return view('order.view')->with('order',$order)->with('bankSettings', $bankSettings)->with('cost', $cost);
     }
 
     public function view_details(Request $request, Order $order)
@@ -250,6 +252,7 @@ class OrderController extends Controller
 
     public function pending_update(Request $request, Order $order)
     {
+        // dd($request->all());
         if ($request->has('status')) {
             if ($order->status === 'completed') {
                 return redirect()->route('order.edit', $order)->withErrors('Order is completed.');
@@ -278,6 +281,7 @@ class OrderController extends Controller
                         'status_by_id'    => Auth::id(),
                         'bank_setting_id' => $request->bank_setting_id,
                         'remarks'         => $request->remarks,
+                        'idr_cost_for_transfer'         => $request->idr_cost_for_transfer,
                     ]);
 
                     // Receipt upload

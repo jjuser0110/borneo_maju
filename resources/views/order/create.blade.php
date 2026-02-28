@@ -123,6 +123,11 @@
                                 required
                             />
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="processing_fees">{{ __('sidebar.remarks') }}
+                            </label>
+                            <textarea class="form-control" name="order_remarks">{{ $order->remarks ?? '' }}</textarea>
+                        </div>
                         <hr>
                         <div class="col-12" style="text-align:right">
                             <button type="submit" name="submitButton" class="btn btn-primary">{{ __('sidebar.submit') }}</button>

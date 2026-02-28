@@ -173,4 +173,10 @@ return [
     'amount_received' => 'Amount Received',
     'print' => 'Print',
     'all_agents' => 'All Agents',
+    'order_remarks'=> 'Order Remarks',
+    'cost' => 'Cost',
+    'cost_listing' => 'Cost Listing',
+    'cost_details' => 'Cost Details',
+    'idr_cost_for_transfer' => 'IDR Cost for Transfer',
+    'idr_cost_for_transfer_placeholder' => 'IDR Cost for Transfer',
 ];

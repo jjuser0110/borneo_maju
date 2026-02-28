@@ -173,4 +173,10 @@ return [
     'amount_received' => 'Jumlah Terima',
     'print' => 'Cetak',
     'all_agents' => 'Semua Ejen',
+    'order_remarks' => 'Catatan Pesanan',
+    'cost' => 'Kos',
+    'cost_listing' => 'Senarai Kos',
+    'cost_details' => 'Butiran Kos',
+    'idr_cost_for_transfer' => 'Kos IDR untuk Pemindahan',
+    'idr_cost_for_transfer_placeholder' => 'Kos IDR untuk Pemindahan',
 ];

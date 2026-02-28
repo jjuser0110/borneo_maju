@@ -173,4 +173,10 @@ return [
     'amount_received' => '收到金额',
     'print' => '打印',
     'all_agents' => '所有代理',
+    'order_remarks' => '订单备注',
+    'cost' => '成本',
+    'cost_listing' => '成本列表',
+    'cost_details' => '成本详情',
+    'idr_cost_for_transfer' => '转账印尼盾成本',
+    'idr_cost_for_transfer_placeholder' => '转账印尼盾成本',
 ];

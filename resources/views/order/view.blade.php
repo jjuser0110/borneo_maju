@@ -161,6 +161,10 @@
                         <p class="card-text text-uppercase">{{ __('sidebar.work') }}</p>
                         <ul class="list-unstyled mb-0">
                             <li class="d-flex align-items-center mb-3">
+                                <i class="bx bx-check bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.order_remarks') }}:</span>
+                                <span>{{ $order->order_remarks ?? '' }}</span>
+                            </li>
+                            <li class="d-flex align-items-center mb-3">
                                 <i class="bx bx-check bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.status') }}:</span>
                                 <span style="width:100%">
                                     @if((isset($view) && $view) || in_array($order->status, ['completed', 'cancelled']))
@@ -192,6 +196,19 @@
                                         <option value="">-- Select Bank --</option>
                                         @foreach ($bankSettings as $bankSetting)
                                             <option value="{{ $bankSetting->id }}" {{ $order->bank_setting_id == $bankSetting->id ? 'checked' : '' }}>{{ $bankSetting->owner_name }} (IDR {{ number_format($bankSetting->amount) }})</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                            </li>
+                            <li class="d-flex align-items-center mb-3">
+                                <i class="bx bx-user bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.idr_cost_for_transfer') }}:</span>
+                                @if((isset($view) && $view) || in_array($order->status, ['completed', 'cancelled']))
+                                    <span>{{ number_format($order->idr_cost_for_transfer ?? 0) }}</span>
+                                @else
+                                    <select class="form-control" name="idr_cost_for_transfer">
+                                        <option value="">-- Select Cost --</option>
+                                        @foreach ($cost as $cost)
+                                            <option value="{{ $cost->idr_cost_for_transfer }}" {{ $order->idr_cost_for_transfer == $cost->idr_cost_for_transfer ? 'checked' : '' }}>(IDR {{ number_format($cost->idr_cost_for_transfer) }})</option>
                                         @endforeach
                                     </select>
                                 @endif

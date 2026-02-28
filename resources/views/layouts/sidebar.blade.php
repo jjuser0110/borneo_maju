@@ -132,6 +132,13 @@ $currentRoute = request()->route()->getName();
             </a>
         </li>
 
+        <li class="menu-item {{ Str::contains($currentRoute, 'cost.index') ? 'active' : ''}}">
+            <a href="{{ route('cost.index') }}" class="menu-link" onclick="showLoading()">
+                <i class="menu-icon tf-icons bx bx-building-house"></i>
+                <div>{{ __('sidebar.cost') }}</div>
+            </a>
+        </li>
+
         @endif
     </ul>
 </aside>

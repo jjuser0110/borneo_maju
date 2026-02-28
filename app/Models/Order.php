@@ -29,6 +29,8 @@ class Order extends Model
         'duration',
         'bank_setting_id',
         'remarks',
+        'order_remarks',
+        'idr_cost_for_transfer'
     ];
 
     public function bank()
