@@ -54,10 +54,12 @@
                             <a href="{{ route('bank_setting.view_stock_log', $stock) }}" onclick="showLoading()">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                             </a>
-                            <a style="color:red;cursor:pointer"
-                                onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){showLoading();window.location.href='{{ route('bank_setting.destroy_stock', $stock) }}'}">
-                                <i class="fa-solid fa-trash"></i>
-                            </a>
+                            @if ($stock->idr_balance == $stock->idr_amount)
+                                <a style="color:red;cursor:pointer"
+                                    onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){showLoading();window.location.href='{{ route('bank_setting.destroy_stock', $stock) }}'}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            @endif
                         </td>
                     </tr>
                     @endforeach
