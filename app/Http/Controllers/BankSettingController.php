@@ -145,4 +145,46 @@ class BankSettingController extends Controller
     {
         return view('bank_setting.stocklog', compact('stock'));
     }
+
+    public function destroy_stock(Stock $stock)
+    {
+        try {
+
+            DB::transaction(function () use ($stock) {
+
+                $stock = Stock::lockForUpdate()->findOrFail($stock->id);
+
+                if (($stock->idr_amount - $stock->idr_balance) > 0) {
+                    throw new \Exception('Stock has been used. Unable to delete stock.');
+                }
+
+                $bank_setting = BankSetting::lockForUpdate()->findOrFail($stock->bank_setting_id);
+
+                $amount       = (float) -$stock->idr_balance;
+                $prev_amount  = (float) $bank_setting->amount;
+                $after_amount = round($prev_amount + $amount, 2);
+
+                $bank_setting->bank_logs()->create([
+                    'bank_setting_id' => $bank_setting->id,
+                    'type'            => 'stock_delete',
+                    'remarks'         => null,
+                    'prev_amount'     => $prev_amount,
+                    'amount'          => abs($amount),
+                    'after_amount'    => $after_amount,
+                ]);
+
+                $bank_setting->update([
+                    'amount' => $after_amount,
+                ]);
+
+                $stock->delete();
+            });
+
+            return redirect()->route('bank_setting.viewlog', $stock->bank_setting_id)->withSuccess('Data deleted');
+
+        } catch (\Exception $e) {
+
+            return back()->withErrors($e->getMessage());
+        }
+    }
 }

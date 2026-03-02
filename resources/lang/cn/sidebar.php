@@ -169,6 +169,7 @@ return [
     'stock_logs' => '库存记录',
     'stock_in' => '库存增加',
     'stock_out' => '库存减少',
+    'stock_delete' => '删除库存',
     'capital_used' => '使用本金',
     'amount_received' => '收到金额',
     'print' => '打印',

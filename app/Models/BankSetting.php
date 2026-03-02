@@ -37,6 +37,6 @@ class BankSetting extends Model
 
     public function getStockAmountAttribute()
     {
-        return $this->hasMany(Stock::class)->sum('idr_amount');
+        return $this->hasMany(Stock::class)->sum('idr_balance');
     }
 }

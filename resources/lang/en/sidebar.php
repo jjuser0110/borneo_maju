@@ -169,6 +169,7 @@ return [
     'stock_logs' => 'Stock Logs',
     'stock_in' => 'Stock In',
     'stock_out' => 'Stock Out',
+    'stock_delete' => 'Stock Deleted',
     'capital_used' => 'Capital Used',
     'amount_received' => 'Amount Received',
     'print' => 'Print',

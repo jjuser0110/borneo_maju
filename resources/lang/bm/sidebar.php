@@ -169,6 +169,7 @@ return [
     'stock_logs' => 'Log Stok',
     'stock_in' => 'Stok Tambah',
     'stock_out' => 'Stok Tolak',
+    'stock_delete' => 'Padam Stok',
     'capital_used' => 'Jumlah Digunakan',
     'amount_received' => 'Jumlah Terima',
     'print' => 'Cetak',
