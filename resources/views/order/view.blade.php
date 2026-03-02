@@ -64,9 +64,9 @@
                     <div class="company-name">BORNEO MAJU</div>
                     <hr>
                     <div class="dt-buttons">
-                        <a class="dt-button create-new btn btn-primary no-print" 
-                        type="button" 
-                        style="float:right;color:white" 
+                        <a class="dt-button create-new btn btn-primary no-print"
+                        type="button"
+                        style="float:right;color:white"
                         onclick="printDiv()">
                             <span>
                                 <i class="bx bx-printer me-sm-1"></i>
@@ -195,7 +195,7 @@
                                     <select class="form-control" name="bank_setting_id">
                                         <option value="">-- Select Bank --</option>
                                         @foreach ($bankSettings as $bankSetting)
-                                            <option value="{{ $bankSetting->id }}" {{ $order->bank_setting_id == $bankSetting->id ? 'checked' : '' }}>{{ $bankSetting->owner_name }} (IDR {{ number_format($bankSetting->amount) }})</option>
+                                            <option value="{{ $bankSetting->id }}" {{ $order->bank_setting_id == $bankSetting->id ? 'selected' : '' }}>{{ $bankSetting->owner_name }} (IDR {{ number_format($bankSetting->amount) }})</option>
                                         @endforeach
                                     </select>
                                 @endif
@@ -208,7 +208,7 @@
                                     <select class="form-control" name="idr_cost_for_transfer">
                                         <option value="">-- Select Cost --</option>
                                         @foreach ($cost as $cost)
-                                            <option value="{{ $cost->idr_cost_for_transfer }}" {{ $order->idr_cost_for_transfer == $cost->idr_cost_for_transfer ? 'checked' : '' }}>(IDR {{ number_format($cost->idr_cost_for_transfer) }})</option>
+                                            <option value="{{ $cost->idr_cost_for_transfer }}" {{ $order->idr_cost_for_transfer == $cost->idr_cost_for_transfer ? 'selected' : '' }}>(IDR {{ number_format($cost->idr_cost_for_transfer) }})</option>
                                         @endforeach
                                     </select>
                                 @endif
@@ -237,7 +237,7 @@
                                 @endif
                             </li>
                         </ul>
-                        
+
                         @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
                             <button type="submit" class="btn btn-primary mt-3" style="float:right">{{ __('sidebar.update_order') }}</button>
                         @endif

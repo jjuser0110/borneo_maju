@@ -341,7 +341,7 @@ class OrderController extends Controller
                         }
                     }
 
-                    $qty_needed = $idrAmount;
+                    $qty_needed = $idrAmount + $request->idr_cost_for_transfer;
                     $totalDeducted = 0;
                     while ($qty_needed > 0) {
                         $stock = Stock::where('bank_setting_id', $bank_setting->id)

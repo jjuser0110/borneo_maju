@@ -34,9 +34,9 @@
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $log->order->order_no ?? "" }}</td>
-                        <td>{{ $log->idr_rate ?? 0 }}</td>
-                        <td>{{ number_format($log->idr_amount ?? 0) }}</td>
-                        <td>{{ number_format($log->capital_used ?? 0, 2) }}</td>
+                        <td style="text-align: right;">{{ $log->stock_idr_rate ?? 0 }}</td>
+                        <td style="text-align: right;">{{ number_format($log->idr_amount ?? 0) }}</td>
+                        <td style="text-align: right;">{{ number_format($log->capital_used ?? 0, 2) }}</td>
                         <td>{{ $log->created_at ?? "" }}</td>
                     </tr>
                     @endforeach
