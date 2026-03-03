@@ -23,6 +23,7 @@
                         <tr>
                             <th>{{ __('sidebar.no') }}</th>
                             <th>{{ __('sidebar.order_no') }}</th>
+                            <th>{{ __('sidebar.name') }}</th>
                             <th>{{ __('sidebar.order_date') }}</th>
                             <th>{{ __('sidebar.bank') }}</th>
                             <th>{{ __('sidebar.idr_amount') }}</th>
@@ -35,6 +36,7 @@
                         <tr>
                             <td>{{$index + 1}}</td>
                             <td>{{$row->order_no??""}}</td>
+                            <td>{{$row->user->name??""}}</td>
                             <td>{{$row->order_datetime??""}}</td>
                             <td>{{$row->bank->bank_name??""}}</td>
                             <td>{{ number_format($row->idr_amount) }}</td>
