@@ -54,6 +54,13 @@
                             <a href="{{ route('bank_setting.view_stock_log', $stock) }}" onclick="showLoading()">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                             </a>
+                            <a href="#" class="edit-stock-btn"
+                                data-id="{{ $stock->id }}"
+                                data-balance="{{ $stock->idr_balance }}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editStockModal">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
                             @if ($stock->idr_balance == $stock->idr_amount)
                                 <a style="color:red;cursor:pointer"
                                     onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){showLoading();window.location.href='{{ route('bank_setting.destroy_stock', $stock) }}'}">
@@ -75,18 +82,17 @@
                     {{ __('sidebar.bank_logs') }} <span style="color:green">IDR {{ number_format($bank_setting->amount ?? 0) }}</span>
                 </h5>
             </div>
-            <div class="dt-action-buttons text-end pt-3 pt-md-0">
+            {{-- <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 <div class="dt-buttons">
                     <button class="dt-button create-new btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#adjustAmountModal">
                         <span>
-                            {{-- <i class="bx bx-plus me-sm-1"></i> --}}
                             <span class="d-none d-sm-inline-block">
                                 {{ __('sidebar.adjust_amount') }}
                             </span>
                         </span>
                     </button>
                 </div>
-            </div>
+            </div> --}}
         </div>
         <div class="card-datatable text-nowrap">
             <table class="dt-column-search table table-bordered" id="mytable2">
@@ -164,7 +170,70 @@
     </div>
 </div>
 
-<div class="modal fade" id="adjustAmountModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="editStockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+            <form action="{{ route('bank_setting.update_stock_balance') }}" method="POST" id="editStockForm">
+                @csrf
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Adjust Stock Balance</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <input type="hidden" name="stock_id" id="edit_stock_id">
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Current Balance (IDR)</label>
+                        <input type="text" id="current_balance" class="form-control" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <select name="type" class="form-control" required>
+                            <option value="">Select Type</option>
+                            <option value="stock_adjust">{{ __('sidebar.stock_adjust') }}</option>
+                            <option value="transfer">{{ __('sidebar.transfer') }}</option>
+                            <option value="expenses">{{ __('sidebar.expenses') }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Amount (IDR)</label>
+                        <input type="number" name="amount" id="edit_amount" class="form-control" min="1" required>
+                        <small id="balance_error" class="text-danger d-none">
+                            Amount exceeds available balance
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Remaining Balance (IDR)</label>
+                        <input type="text" id="remaining_balance" class="form-control" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Remarks</label>
+                        <input type="text" name="remarks" class="form-control">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="edit_submit_btn">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- <div class="modal fade" id="adjustAmountModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered">
         <div class="modal-content">
             <form action="{{ route('bank_setting.adjust_money') }}" method="POST" onsubmit="showLoading()">
@@ -199,7 +268,7 @@
             </form>
         </div>
     </div>
-</div>
+</div> --}}
 @endsection
 
 @section('page-js')
@@ -275,5 +344,42 @@ $(function(){
         console.log(Math.round(myr * rate));
         isUpdating = false;
     });
+
+    $(document).ready(function () {
+
+    let currentBalance = 0;
+
+    // When clicking edit icon
+    $('.edit-stock-btn').on('click', function () {
+
+        let stockId = $(this).data('id');
+        currentBalance = parseFloat($(this).data('balance'));
+
+        $('#edit_stock_id').val(stockId);
+        $('#current_balance').val(currentBalance.toLocaleString());
+        $('#remaining_balance').val(currentBalance.toLocaleString());
+        $('#edit_amount').val('');
+        $('#balance_error').addClass('d-none');
+        $('#edit_submit_btn').prop('disabled', false);
+    });
+
+    // When typing amount
+    $('#edit_amount').on('input', function () {
+
+        let amount = parseFloat($(this).val()) || 0;
+        let remaining = currentBalance - amount;
+
+        if (amount > currentBalance) {
+            $('#balance_error').removeClass('d-none');
+            $('#edit_submit_btn').prop('disabled', true);
+            $('#remaining_balance').val('0');
+        } else {
+            $('#balance_error').addClass('d-none');
+            $('#edit_submit_btn').prop('disabled', false);
+            $('#remaining_balance').val(remaining.toLocaleString());
+        }
+    });
+
+});
 </script>
 @endsection

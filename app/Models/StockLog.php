@@ -18,6 +18,7 @@ class StockLog extends Model
         'idr_amount',
         'stock_idr_rate',
         'capital_used',
+        'remarks',
     ];
 
     public function bankSetting()

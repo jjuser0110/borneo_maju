@@ -22,7 +22,8 @@
                 <thead>
                     <tr>
                         <th>{{ __('sidebar.no') }}</th>
-                        <th>{{ __('sidebar.myr_amount') }}</th>
+                        <th>{{ __('sidebar.order_no') }}</th>
+                        <th>{{ __('sidebar.remarks') }}</th>
                         <th>{{ __('sidebar.idr_rate') }}</th>
                         <th>{{ __('sidebar.idr_amount') }}</th>
                         <th>{{ __('sidebar.capital_used') }}</th>
@@ -34,6 +35,7 @@
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $log->order->order_no ?? "" }}</td>
+                        <td>{{ $log->remarks ?? "" }}</td>
                         <td style="text-align: right;">{{ $log->stock_idr_rate ?? 0 }}</td>
                         <td style="text-align: right;">{{ number_format($log->idr_amount ?? 0) }}</td>
                         <td style="text-align: right;">{{ number_format($log->capital_used ?? 0, 2) }}</td>

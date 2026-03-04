@@ -187,4 +187,60 @@ class BankSettingController extends Controller
             return back()->withErrors($e->getMessage());
         }
     }
+
+    public function updateStockBalance(Request $request)
+    {
+        $request->validate([
+            'stock_id'    => 'required|exists:stocks,id',
+            'amount'      => 'required|numeric',
+            'type'        => 'required',
+        ]);
+
+        try {
+            DB::transaction(function () use ($request) {
+                $stock = Stock::lockForUpdate()->findOrFail($request->stock_id);
+
+                if ($request->amount > $stock->idr_balance) {
+                    throw new \Exception('Amount exceeds available balance.');
+                }
+
+                $bank_setting = BankSetting::lockForUpdate()->findOrFail($stock->bank_setting_id);
+
+                $amount       = (float) $request->amount;
+                $prev_amount  = (float) $bank_setting->amount;
+                $after_amount = round($prev_amount + $amount, 2);
+
+                $bank_setting->bank_logs()->create([
+                    'bank_setting_id' => $bank_setting->id,
+                    'type'            => $request->type,
+                    'remarks'         => $request->remarks,
+                    'prev_amount'     => $prev_amount,
+                    'amount'          => abs($amount),
+                    'after_amount'    => $after_amount,
+                ]);
+
+                $bank_setting->update([
+                    'amount' => $after_amount,
+                ]);
+
+                // Update stock balance
+                $stock->update([
+                    'idr_balance' => $stock->idr_balance - $amount
+                ]);
+
+                $stock->stock_logs()->create([
+                    'bank_setting_id'   => $stock->bank_setting_id,
+                    'idr_amount'        => $request->amount,
+                    'stock_idr_rate'    => $stock->idr_rate,
+                    'capital_used'      => round($request->amount / $stock->idr_rate, 2),
+                    'remarks'           => $request->remarks,
+                ]);
+            });
+
+            return back()->withSuccess('Data updated');
+        } catch (\Exception $e) {
+
+            return back()->withErrors($e->getMessage());
+        }
+    }
 }
