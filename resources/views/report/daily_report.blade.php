@@ -90,6 +90,57 @@
             </div>
 
         </div>
+
+        @isset($bankSettings)
+            <div class="card mb-3">
+                <div class="card-header flex-column flex-md-row">
+                    <div class="head-label">
+                        <h5 class="card-title mb-0">Bank Settings</h5>
+                    </div>
+                </div>
+                <div class="card-datatable text-nowrap">
+                    <table class="dt-column-search table table-bordered" id="mytable">
+                        <thead>
+                            <tr>
+                                <th>{{ __('sidebar.bank_name') }}</th>
+                                <th>{{ __('sidebar.account_no') }}</th>
+                                <th>{{ __('sidebar.stock_in') }}</th>
+                                <th>{{ __('sidebar.stock_out') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($bankSettings as $bank)
+                                @php
+                                    $log = $bankLogs[$bank->id] ?? null;
+                                @endphp
+                                <tr>
+                                    <td>{{ $bank->bank->bank_name ?? "" }}</td>
+                                    <td><a href="{{ route('bank_setting.viewlog', $bank->id) }}?date={{ $date ?? date('Y-m-d') }}">{{ $bank->account_no ?? "" }}</a></td>
+                                    <td style="color:green; text-align:right;">
+                                        {{ number_format($log->total_stock_in ?? 0) }}
+                                    </td>
+
+                                    <td style="color:red; text-align:right;">
+                                        {{ number_format($log->total_stock_out ?? 0) }}
+                                    </td>
+                            @endforeach
+                        </tbody>
+                        @php
+                            $grandIn = $bankLogs->sum('total_stock_in');
+                            $grandOut = $bankLogs->sum('total_stock_out');
+                        @endphp
+                        <tfoot>
+                            <tr>
+                                <td colspan="2" class="text-end"><strong>Total</strong></td>
+                                <td class="text-end text-success"><strong>{{ number_format($grandIn) }}</strong></td>
+                                <td class="text-end text-danger"><strong>{{ number_format($grandOut) }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        @endisset
+
     </div>
     <!-- / Content -->
 @endsection

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Http\Request;
 use App\Models\Bank;
+use App\Models\BankLog;
+use App\Models\BankSetting;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use DB;
 
 class ReportController extends Controller
 {
@@ -176,6 +179,32 @@ class ReportController extends Controller
         $amount_received  = $profits->sum('amount_received');
         $profit           = $profits->sum('profit');
 
+        $bankSettings = BankSetting::all();
+        $bankLogs = BankLog::select(
+                'bank_setting_id',
+                DB::raw("
+                    SUM(
+                        CASE
+                            WHEN type = 'stock_in' THEN amount
+                            WHEN type = 'stock_delete' THEN -amount
+                            ELSE 0
+                        END
+                    ) as total_stock_in
+                "),
+                DB::raw("
+                    SUM(
+                        CASE
+                            WHEN type = 'stock_out' THEN amount
+                            ELSE 0
+                        END
+                    ) as total_stock_out
+                ")
+            )
+            ->whereDate('created_at', $date)
+            ->groupBy('bank_setting_id')
+            ->get()
+            ->keyBy('bank_setting_id');
+
         return view('report.daily_report', compact(
             'date',
             'stock_in',
@@ -183,6 +212,8 @@ class ReportController extends Controller
             'capital_used',
             'amount_received',
             'profit',
+            'bankSettings',
+            'bankLogs',
         ));
     }
 

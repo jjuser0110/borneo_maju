@@ -77,10 +77,56 @@
 
     <div class="card mb-3">
         <div class="card-header flex-column flex-md-row">
-            <div class="head-label">
+            <div class="head-label mb-3">
                 <h5 class="card-title mb-0">
                     {{ __('sidebar.bank_logs') }} <span style="color:green">IDR {{ number_format($bank_setting->amount ?? 0) }}</span>
                 </h5>
+            </div>
+            <div class="col-12 mb-4">
+                <form method="GET" onsubmit="showLoading()">
+                    <div class="row g-2 align-items-end">
+
+                        <div class="col-md-4">
+                            <label>Date</label>
+                            <input type="date" class="form-control" name="date" value="{{ request('date') }}">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>{{ __('sidebar.description') }}</label>
+                            <select name="type[]" class="form-control select2" multiple>
+                                <option value="stock_in" {{ in_array('stock_in', request('type', [])) ? 'selected' : '' }}>
+                                    {{ __('sidebar.stock_in') }}
+                                </option>
+                                <option value="stock_out" {{ in_array('stock_out', request('type', [])) ? 'selected' : '' }}>
+                                    {{ __('sidebar.stock_out') }}
+                                </option>
+                                <option value="stock_delete" {{ in_array('stock_delete', request('type', [])) ? 'selected' : '' }}>
+                                    {{ __('sidebar.stock_delete') }}
+                                </option>
+                                <option value="stock_adjust_in" {{ in_array('stock_adjust_in', request('type', [])) ? 'selected' : '' }}>
+                                    {{ __('sidebar.stock_adjust_in') }}
+                                </option>
+                                <option value="stock_adjust_out" {{ in_array('stock_adjust_out', request('type', [])) ? 'selected' : '' }}>
+                                    {{ __('sidebar.stock_adjust_out') }}
+                                </option>
+                                <option value="transfer_in" {{ in_array('transfer_in', request('type', [])) ? 'selected' : '' }}>
+                                    {{ __('sidebar.transfer_in') }}
+                                </option>
+                                <option value="transfer_out" {{ in_array('transfer_out', request('type', [])) ? 'selected' : '' }}>
+                                    {{ __('sidebar.transfer_out') }}
+                                </option>
+                                <option value="expenses" {{ in_array('expenses', request('type', [])) ? 'selected' : '' }}>
+                                    {{ __('sidebar.expenses') }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-1">
+                            <button class="btn btn-primary w-100">Filter</button>
+                        </div>
+
+                    </div>
+                </form>
             </div>
             {{-- <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 <div class="dt-buttons">
@@ -108,20 +154,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($bank_setting->bank_logs as $index => $row)
+                    @foreach($bank_logs as $index => $row)
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ __('sidebar.' . $row->type ?? "") }}</td>
                         <td>{{ $row->remarks ?? "" }}</td>
                         <td style="text-align: right;">{{ number_format($row->prev_amount ?? 0, 2) }}</td>
-                        <td @if($row->after_amount > $row->prev_amount) style="color:green; text-align: right;"
-                            @elseif($row->after_amount < $row->prev_amount) style="color:red; text-align: right;"
-                            @endif>{{ number_format($row->amount ?? 0) }}</td>
+                        <td style="text-align: right; color: {{ $row->signed_amount < 0 ? 'red' : 'green' }}">
+                            {{ number_format($row->signed_amount) }}
+                        </td>
                         <td style="text-align: right;">{{ number_format($row->after_amount ?? 0) }}</td>
                         <td>{{ $row->created_at ?? "" }}</td>
                     </tr>
                     @endforeach
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="4" class="text-end">Total:</th>
+                        <th style="text-align: right;"></th> {{-- Amount total here --}}
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
@@ -142,6 +196,15 @@
                 <input type="hidden" name="bank_setting_id" id="bank_setting_id" value="{{ $bank_setting->id }}">
                 <div class="modal-body">
                     <div class="mb-3">
+                        <label class="form-label">{{ __('sidebar.description') }}</label>
+                        <select name="type" class="form-control" required>
+                            <option value="">{{ __('sidebar.select_type') }}</option>
+                            <option value="stock_in">{{ __('sidebar.stock_in') }}</option>
+                            <option value="transfer_in">{{ __('sidebar.transfer_in') }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label">{{ __('sidebar.myr_amount') }}</label>
                         <input type="number" name="myr_amount" id="myr_amount" class="form-control" min="0" step="0.01" required>
                     </div>
@@ -154,6 +217,11 @@
                     <div class="mb-3">
                         <label class="form-label">{{ __('sidebar.idr_amount') }}</label>
                         <input type="number" name="idr_amount" id="idr_amount" class="form-control" min="0" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('sidebar.remarks') }}</label>
+                        <input type="text" name="remarks" class="form-control">
                     </div>
                 </div>
 
@@ -177,7 +245,7 @@
                 @csrf
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Adjust Stock Balance</h5>
+                    <h5 class="modal-title">{{ __('sidebar.adjust_stock_balance') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
@@ -186,14 +254,14 @@
                 <div class="modal-body">
 
                     <div class="mb-3">
-                        <label class="form-label">Current Balance (IDR)</label>
-                        <input type="text" id="current_balance" class="form-control" readonly>
+                        <label class="form-label">{{ __('sidebar.current_balance') }}</label>
+                        <input type="text" id="current_balance" class="form-control" disabled>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Description</label>
+                        <label class="form-label">{{ __('sidebar.description') }}</label>
                         <select name="type" class="form-control" required>
-                            <option value="">Select Type</option>
+                            <option value="">{{ __('sidebar.select_type') }}</option>
                             <option value="stock_adjust">{{ __('sidebar.stock_adjust') }}</option>
                             <option value="transfer">{{ __('sidebar.transfer') }}</option>
                             <option value="expenses">{{ __('sidebar.expenses') }}</option>
@@ -201,20 +269,20 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Amount (IDR)</label>
-                        <input type="number" name="amount" id="edit_amount" class="form-control" min="1" required>
+                        <label class="form-label">{{ __('sidebar.amount') }}</label>
+                        <input type="number" name="amount" id="edit_amount" class="form-control" step="0.01" required>
                         <small id="balance_error" class="text-danger d-none">
-                            Amount exceeds available balance
+                            {{ __('sidebar.amount_exceeds_available_balance') }}
                         </small>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Remaining Balance (IDR)</label>
-                        <input type="text" id="remaining_balance" class="form-control" readonly>
+                        <label class="form-label">{{ __('sidebar.remaining_balance') }}</label>
+                        <input type="text" id="remaining_balance" class="form-control" disabled>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Remarks</label>
+                        <label class="form-label">{{ __('sidebar.remarks') }}</label>
                         <input type="text" name="remarks" class="form-control">
                     </div>
 
@@ -222,10 +290,10 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
+                        {{ __('sidebar.close') }}
                     </button>
                     <button type="submit" class="btn btn-primary" id="edit_submit_btn">
-                        Save Changes
+                        {{ __('sidebar.save_changes') }}
                     </button>
                 </div>
             </form>
@@ -286,12 +354,36 @@ $(function(){
   });
 
   var table = $('#mytable2').DataTable({
-    dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-    pageLength: 10,
-    displayLength: 5,
-    ordering:false,
-    lengthMenu: [5, 10, 25, 50, 75, 100],
-  });
+        dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>' +
+             '<"table-responsive"t>' +
+             '<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+        pageLength: 10,
+        ordering: false,
+
+        footerCallback: function (row, data, start, end, display) {
+
+            var api = this.api();
+
+            var intVal = function (i) {
+                return typeof i === 'string'
+                    ? i.replace(/,/g, '') * 1
+                    : typeof i === 'number'
+                        ? i
+                        : 0;
+            };
+
+            var total = api
+                .column(4, { search: 'applied' }) // sum filtered rows only
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            $(api.column(4).footer()).html(
+                total.toLocaleString()
+            );
+        }
+    });
 });
 </script>
 

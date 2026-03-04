@@ -172,7 +172,11 @@ return [
     'stock_out' => 'Stock Out',
     'stock_delete' => 'Stock Deleted',
     'stock_adjust' => 'Stock Adjustment',
-    'transfer' => 'Transferred',
+    'stock_adjust_in' => 'Stock Adjustment In',
+    'stock_adjust_out' => 'Stock Adjustment Out',
+    'transfer_in' => 'Transferred In',
+    'transfer_out' => 'Transferred Out',
+    'transfer' => 'Transfer',
     'expenses' => 'Expenses',
     'capital_used' => 'Capital Used',
     'amount_received' => 'Amount Received',
@@ -184,4 +188,10 @@ return [
     'cost_details' => 'Cost Details',
     'idr_cost_for_transfer' => 'IDR Cost for Transfer',
     'idr_cost_for_transfer_placeholder' => 'IDR Cost for Transfer',
+
+    'adjust_stock_balance' => 'Adjust Stock Balance',
+    'current_balance' => 'Current Balance (IDR)',
+    'remaining_balance' => 'Remaining Balance (IDR)',
+    'amount_exceeds_available_balance' => 'Amount exceeds available balance',
+    'select_type' => 'Select Type',
 ];

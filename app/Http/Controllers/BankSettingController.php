@@ -85,9 +85,25 @@ class BankSettingController extends Controller
         return back()->withSuccess('Amount adjusted');
     }
 
-    public function viewlog(BankSetting $bank_setting)
+    public function viewlog(Request $request, BankSetting $bank_setting)
     {
-        return view('bank_setting.viewlog', compact('bank_setting'));
+        $types = $request->input('type', []);
+
+        $bank_logs = $bank_setting->bank_logs()
+            ->when($request->date, function ($query) use ($request) {
+                $query->whereDate('created_at', $request->date);
+            })
+            ->when(!empty($types), function ($query) use ($types) {
+                $query->whereIn('type', $types);
+            })
+            ->latest()
+            ->get()
+            ->map(function ($log) {
+                $log->signed_amount = $log->after_amount - $log->prev_amount;
+                return $log;
+            });
+
+        return view('bank_setting.viewlog', compact('bank_setting', 'bank_logs'));
     }
 
     public function addStock(Request $request)
@@ -115,7 +131,12 @@ class BankSettingController extends Controller
             $prev_amount  = (float) $bank_setting->amount;
             $after_amount = round($prev_amount + $amount, 2);
 
-            $type = $amount > 0 ? 'stock_in' : 'stock_out';
+            if ($request->type == 'stock_in') {
+                $type = $amount > 0 ? 'stock_in' : 'stock_out';
+            } else if ($request->type == 'transfer_in') {
+                $type = $amount > 0 ? 'transfer_in' : 'transfer_out';
+            }
+
 
             $stock = $bank_setting->stocks()->create([
                 'idr_rate'    => $request->idr_rate,
@@ -126,11 +147,12 @@ class BankSettingController extends Controller
 
             $bank_setting->bank_logs()->create([
                 'bank_setting_id' => $bank_setting->id,
-                'type'            => $type,
+                'type'            => $type ?? $request->type,
                 'remarks'         => null,
                 'prev_amount'     => $prev_amount,
                 'amount'          => abs($amount),
                 'after_amount'    => $after_amount,
+                'remarks'         => $request->remarks,
             ]);
 
             $bank_setting->update([
@@ -208,11 +230,22 @@ class BankSettingController extends Controller
 
                 $amount       = (float) $request->amount;
                 $prev_amount  = (float) $bank_setting->amount;
-                $after_amount = round($prev_amount + $amount, 2);
+                $after_amount = round($prev_amount - $amount, 2);
+
+                if ($request->type == 'stock_adjust') {
+                    $type = $amount < 0
+                        ? 'stock_adjust_in'
+                        : 'stock_adjust_out';
+                } else if ($request->type == 'transfer') {
+                    $type = $amount < 0
+                        ? 'transfer_in'
+                        : 'transfer_out';
+                }
+
 
                 $bank_setting->bank_logs()->create([
                     'bank_setting_id' => $bank_setting->id,
-                    'type'            => $request->type,
+                    'type'            => $type ?? $request->type,
                     'remarks'         => $request->remarks,
                     'prev_amount'     => $prev_amount,
                     'amount'          => abs($amount),

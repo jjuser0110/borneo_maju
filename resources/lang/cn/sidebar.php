@@ -172,6 +172,10 @@ return [
     'stock_out' => '库存减少',
     'stock_delete' => '删除库存',
     'stock_adjust' => '库存调整',
+    'stock_adjust_in' => '库存调整（增加）',
+    'stock_adjust_out' => '库存调整（减少）',
+    'transfer_in' => '转进',
+    'transfer_out' => '转出',
     'transfer' => '转移',
     'expenses' => '支出',
     'capital_used' => '使用本金',
@@ -184,4 +188,10 @@ return [
     'cost_details' => '成本详情',
     'idr_cost_for_transfer' => '转账印尼盾成本',
     'idr_cost_for_transfer_placeholder' => '转账印尼盾成本',
+
+    'adjust_stock_balance' => '调整库存余额',
+    'current_balance' => '当前余额 (IDR)',
+    'remaining_balance' => '剩余余额 (IDR)',
+    'amount_exceeds_available_balance' => '超出可用余额的金额',
+    'select_type' => '选择类型',
 ];

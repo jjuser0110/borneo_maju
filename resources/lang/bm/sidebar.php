@@ -172,6 +172,10 @@ return [
     'stock_out' => 'Stok Tolak',
     'stock_delete' => 'Padam Stok',
     'stock_adjust' => 'Laraskan Stok',
+    'stock_adjust_in' => 'Laraskan Stok (Tambah)',
+    'stock_adjust_out' => 'Laraskan Stok (Tolak)',
+    'transfer_in' => 'Pindah Masuk',
+    'transfer_out' => 'Pindah Keluar',
     'transfer' => 'Dipindahkan',
     'expenses' => 'Perbelanjaan',
     'capital_used' => 'Jumlah Digunakan',
@@ -184,4 +188,10 @@ return [
     'cost_details' => 'Butiran Kos',
     'idr_cost_for_transfer' => 'Kos IDR untuk Pemindahan',
     'idr_cost_for_transfer_placeholder' => 'Kos IDR untuk Pemindahan',
+
+    'adjust_stock_balance' => 'Laraskan Baki Stok',
+    'current_balance' => 'Baki Semasa (IDR)',
+    'remaining_balance' => 'Baki Tinggal (IDR)',
+    'amount_exceeds_available_balance' => 'Amaun melebihi baki yang tersedia',
+    'select_type' => 'Pilih Jenis',
 ];
