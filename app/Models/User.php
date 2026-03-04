@@ -32,6 +32,7 @@ class User extends Authenticatable
         'idr_rate',
         'point',
         'processing_fees',
+        'limit',
     ];
 
     /**

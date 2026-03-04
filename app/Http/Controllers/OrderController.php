@@ -125,7 +125,7 @@ class OrderController extends Controller
         $loginUser = Auth::user();
 
         $request->validate([
-            'myr_amount' => 'required|numeric|min:0',
+            'myr_amount' => 'required|numeric|min:0|max:' . Auth::user()->limit ?? 5000,
             'processing_fees' => 'required|numeric|min:0',
         ]);
 

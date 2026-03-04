@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="py-3 breadcrumb-wrapper mb-4">
-        <a class="text-muted fw-light" href="{{ route('order.index') }}"> {{ __('sidebar.orders') }} /</a> 
+        <a class="text-muted fw-light" href="{{ route('order.index') }}"> {{ __('sidebar.orders') }} /</a>
          @if (isset($order)) {{ __('sidebar.edit') }} @else {{ __('sidebar.create') }} @endif
     </h4>
     <div class="row">
@@ -11,9 +11,9 @@
             <div class="card">
                 <h5 class="card-header">{{ __('sidebar.order_details') }}</h5>
                 <div class="card-body">
-                    <form class="row g-3" enctype="multipart/form-data" 
-                          @if (isset($order)) method="post" action="{{ route('order.update', $order) }}" 
-                          @else method="post" action="{{ route('order.store') }}" @endif 
+                    <form class="row g-3" enctype="multipart/form-data"
+                          @if (isset($order)) method="post" action="{{ route('order.update', $order) }}"
+                          @else method="post" action="{{ route('order.store') }}" @endif
                           onsubmit="showLoading()">
                         @csrf
                         <div class="col-md-6">
@@ -91,6 +91,7 @@
                             <input
                                 type="number"
                                 class="form-control"
+                                max="{{ Auth::user()->limit ?? 5000 }}"
                                 min="0"
                                 step="0.01"
                                 name="myr_amount"

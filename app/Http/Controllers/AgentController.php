@@ -36,6 +36,9 @@ class AgentController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
+        $request->validate([
+            'limit' => 'required|numeric|max:' . Auth::user()->limit ?? '5000',
+        ]);
         $loginUser = Auth::user();
         if($loginUser->role_id == 3){
             $request->merge(['username'=> $loginUser->username.$request->username]);
@@ -103,6 +106,9 @@ class AgentController extends Controller
 
     public function update(Request $request, User $agent)
     {
+        $request->validate([
+            'limit' => 'required|numeric|max:' . Auth::user()->limit ?? '5000',
+        ]);
         if($request->password !=null){
             $request->merge(['password' => Hash::make($request->password)]);
         }else{
@@ -128,6 +134,16 @@ class AgentController extends Controller
 
             $difference = $agent->processing_fees - $request->processing_fees;
             $this->updateDownlines($agent->downlines, 'processing_fees', $difference);
+        }
+        if($request->limit != $agent->limit){
+            $agent->save_history()->create([
+                'field_name' => 'limit',
+                'old_value' => $agent->limit,
+                'new_value' => $request->limit,
+            ]);
+
+            $difference = $agent->limit - $request->limit;
+            $this->updateDownlines($agent->downlines, 'limit', $difference);
         }
         $agent->update($request->all());
         return redirect()->route('agent.index')->withSuccess('Data updated');
@@ -188,7 +204,7 @@ class AgentController extends Controller
                 'description'  => 'Top Up From ' . $loginUser->username,
             ]);
 
-            
+
             if($loginUser->role_id == 3){
                 $loginuser_point_before = $loginUser->point;
                 $loginuser_point_after = $loginUser->point - $request->point;

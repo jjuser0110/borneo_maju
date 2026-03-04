@@ -85,6 +85,7 @@ return [
     'agent_name_placeholder' => 'Agent Name',
     'agent_username'   => 'Agent Username',
     'agent_username_placeholder' => 'Username',
+    'limit'            => 'Limit',
 
     'username'         => 'Username',
     'name'             => 'Name',

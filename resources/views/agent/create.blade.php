@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="py-3 breadcrumb-wrapper mb-4">
-        <a class="text-muted fw-light" href="{{ route('agent.index') }}">{{ __('sidebar.agent') }} /</a> 
+        <a class="text-muted fw-light" href="{{ route('agent.index') }}">{{ __('sidebar.agent') }} /</a>
          @if (isset($agent)) {{ __('sidebar.edit') }} @else {{ __('sidebar.create') }} @endif
     </h4>
 
@@ -12,8 +12,8 @@
             <div class="card">
                 <h5 class="card-header">{{ __('sidebar.agent_details') }}</h5>
                 <div class="card-body">
-                    <form class="row g-3" enctype="multipart/form-data" 
-                        @if (isset($agent)) method="post" action="{{ route('agent.update', $agent) }}" 
+                    <form class="row g-3" enctype="multipart/form-data"
+                        @if (isset($agent)) method="post" action="{{ route('agent.update', $agent) }}"
                         @else method="post" action="{{ route('agent.store') }}" @endif
                         onsubmit="showLoading()">
                         @csrf
@@ -24,7 +24,7 @@
                                    class="form-control"
                                    placeholder="{{ __('sidebar.agent_name_placeholder') }}"
                                    name="name"
-                                   value="{{ $agent->name ?? '' }}" 
+                                   value="{{ $agent->name ?? '' }}"
                                    required/>
                         </div>
 
@@ -35,7 +35,7 @@
                                     <input type="text"
                                            class="form-control"
                                            placeholder="{{ __('sidebar.agent_username_placeholder') }}"
-                                           name="username" 
+                                           name="username"
                                            value="{{ $agent->username ?? '' }}"
                                            readonly
                                     />
@@ -52,7 +52,7 @@
                                 <input type="text"
                                        class="form-control"
                                        placeholder="{{ __('sidebar.agent_username_placeholder') }}"
-                                       name="username" 
+                                       name="username"
                                        value="{{ $agent->username ?? '' }}"
                                        required
                                        @if(isset($agent)) readonly @endif
@@ -71,7 +71,7 @@
 
                         @if(!isset($agent))
                         <div class="col-md-6">
-                            <label class="form-label" for="point">{{ __('sidebar.point') }} 
+                            <label class="form-label" for="point">{{ __('sidebar.point') }}
                                 <span class="badge bg-success">{{ __('sidebar.balance') }}: {{ Auth::user()->point ?? 'unlimited' }}</span>
                             </label>
                             <input type="number"
@@ -79,7 +79,7 @@
                                    max="{{ Auth::user()->point ?? '9999999999999' }}"
                                    class="form-control"
                                    name="point"
-                                   value="{{ $agent->point ?? '' }}" 
+                                   value="{{ $agent->point ?? '' }}"
                                    required/>
                         </div>
                         @endif
@@ -93,7 +93,7 @@
                                    max="{{ Auth::user()->idr_rate ?? '9999999999999' }}"
                                    class="form-control"
                                    name="idr_rate"
-                                   value="{{ $agent->idr_rate ?? '' }}" 
+                                   value="{{ $agent->idr_rate ?? '' }}"
                                    required/>
                         </div>
 
@@ -105,7 +105,20 @@
                                    min="{{ Auth::user()->processing_fees ?? '1' }}"
                                    class="form-control"
                                    name="processing_fees"
-                                   value="{{ $agent->processing_fees ?? '' }}" 
+                                   value="{{ $agent->processing_fees ?? '' }}"
+                                   required/>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="limit">{{ __('sidebar.limit') }}
+                                <span class="badge bg-success">{{ __('sidebar.limit') }}: {{ Auth::user()->limit ?? 'unlimited' }}</span>
+                            </label>
+                            <input type="number"
+                                   min="1"
+                                   max="{{ Auth::user()->limit ?? '5000' }}"
+                                   class="form-control"
+                                   name="limit"
+                                   value="{{ $agent->limit ?? '' }}"
                                    required/>
                         </div>
 

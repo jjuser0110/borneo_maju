@@ -85,6 +85,7 @@ return [
     'agent_name_placeholder' => 'Masukkan Nama Ejen',
     'agent_username'   => 'Nama Pengguna Ejen',
     'agent_username_placeholder' => 'Nama Pengguna',
+    'limit'            => 'Had',
 
     'username'         => 'Nama Pengguna',
     'name'             => 'Nama',

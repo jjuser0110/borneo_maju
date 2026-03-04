@@ -85,6 +85,7 @@ return [
     'agent_name_placeholder' => '请输入代理姓名',
     'agent_username'   => '代理用户名',
     'agent_username_placeholder' => '请输入用户名',
+    'limit'            => '限制',
 
     'username'         => '用户名',
     'name'             => '姓名',
