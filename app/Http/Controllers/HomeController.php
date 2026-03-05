@@ -41,7 +41,9 @@ class HomeController extends Controller
 
     public function index(Request $request)
     {
-        if (Auth::user()->role_id == 3) { // agent
+        if (Auth::user()->role_id == 2) { // staff
+            return redirect()->route('order.pending');
+        } else if (Auth::user()->role_id == 3) { // agent
             return redirect()->route('report.sales_report');
         }
 

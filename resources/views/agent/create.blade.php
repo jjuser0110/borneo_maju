@@ -115,7 +115,9 @@
                             </label>
                             <input type="number"
                                    min="1"
-                                   max="{{ Auth::user()->limit ?? '5000' }}"
+                                   @if (Auth::user()->role_id !== 1 && !is_null(Auth::user()->limit))
+                                       max="{{ Auth::user()->limit }}"
+                                   @endif
                                    class="form-control"
                                    name="limit"
                                    value="{{ $agent->limit ?? '' }}"

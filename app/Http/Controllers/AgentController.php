@@ -35,11 +35,18 @@ class AgentController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
-        $request->validate([
-            'limit' => 'required|numeric|max:' . Auth::user()->limit ?? '5000',
-        ]);
         $loginUser = Auth::user();
+
+        $rules = [
+            'limit' => ['required', 'numeric'],
+        ];
+
+        if ($loginUser->role_id !== 1 && !is_null($loginUser->limit)) { // not admin
+            $rules['limit'][] = 'max:' . $loginUser->limit;
+        }
+
+        $request->validate($rules);
+
         if($loginUser->role_id == 3){
             $request->merge(['username'=> $loginUser->username.$request->username]);
         }
@@ -106,9 +113,18 @@ class AgentController extends Controller
 
     public function update(Request $request, User $agent)
     {
-        $request->validate([
-            'limit' => 'required|numeric|max:' . Auth::user()->limit ?? '5000',
-        ]);
+        $user = Auth::user();
+
+        $rules = [
+            'limit' => ['required', 'numeric'],
+        ];
+
+        if ($user->role_id !== 1 && !is_null($user->limit)) { // not admin
+            $rules['limit'][] = 'max:' . $user->limit;
+        }
+
+        $request->validate($rules);
+
         if($request->password !=null){
             $request->merge(['password' => Hash::make($request->password)]);
         }else{
