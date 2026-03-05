@@ -41,6 +41,10 @@ class HomeController extends Controller
 
     public function index(Request $request)
     {
+        if (Auth::user()->role_id == 3) { // agent
+            return redirect()->route('report.sales_report');
+        }
+
         $date_from = $request->date_from
         ? Carbon::parse($request->date_from)->startOfDay()
         : Carbon::now()->startOfDay();
