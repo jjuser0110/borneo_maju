@@ -9,9 +9,9 @@
 
             <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
                 <ul class="navbar-nav flex-row align-items-center ms-auto">
-
-                    <a class="btn btn-primary" style="margin-left:5px"
-                       href="{{ route('my_point_logs') }}" onclick="showLoading()">
+                    <span style="color:blue">RP {{ number_format(Auth::user()->idr_rate) }}</span>
+                    <a class="btn btn-primary" style="margin-left:5px;padding:5px;font-size:12px;"
+                       href="{{ route('my_point_logs') }}" style="" onclick="showLoading()">
                         {{ __('sidebar.balance') }} : {{ number_format(Auth::user()->point,2) }}
                     </a>
 
