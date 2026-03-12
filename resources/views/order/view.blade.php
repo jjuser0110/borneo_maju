@@ -168,7 +168,13 @@
                                 <i class="bx bx-check bx-xs"></i><span class="fw-medium mx-2">{{ __('sidebar.status') }}:</span>
                                 <span style="width:100%">
                                     @if((isset($view) && $view) || in_array($order->status, ['completed', 'cancelled']))
-                                        {{ $order->status ?? '' }}
+                                        @if ($order->status == 'completed')
+                                            <span class="badge bg-success">{{ $order->status }}</span>
+                                        @elseif ($order->status == 'cancelled')
+                                            <span class="badge bg-danger">{{ $order->status }}</span>
+                                        @else
+                                            <span class="badge bg-warning">{{ $order->status }}</span>
+                                        @endif
                                     @else
                                         <select class="form-control" name="status">
                                             <option value="pending" {{ $order->status=='pending'?'selected':'' }}>{{ __('sidebar.pending') }}</option>

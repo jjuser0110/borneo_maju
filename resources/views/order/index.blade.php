@@ -79,7 +79,15 @@
                             <td style="text-align:right">{{number_format($row->idr_amount)}}</td>
                             <td style="text-align:right">{{number_format($row->processing_fees, 2)}}</td>
                             <td style="text-align:right">{{number_format($row->total_amount, 2)}}</td>
-                            <td>{{$row->status??""}}</td>
+                            <td>
+                                @if ($row->status == 'completed')
+                                    <span class="badge bg-success">{{ $row->status }}</span>
+                                @elseif ($row->status == 'cancelled')
+                                    <span class="badge bg-danger">{{ $row->status }}</span>
+                                @else
+                                    <span class="badge bg-warning">{{ $row->status }}</span>
+                                @endif
+                            </td>
                             <td>
                                 <a href="{{ route('order.view_details',$row) }}" onclick="showLoading()"><i class="fa-solid fa-eye"></i></a>
                                 @if (Auth::user()->id === $row->user_id && $row->status == 'pending')

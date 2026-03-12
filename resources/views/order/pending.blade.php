@@ -40,7 +40,15 @@
                             <td>{{$row->order_datetime??""}}</td>
                             <td>{{$row->bank->bank_name??""}}</td>
                             <td>{{ number_format($row->idr_amount) }}</td>
-                            <td>{{$row->status??""}}</td>
+                            <td>
+                                @if ($row->status == 'completed')
+                                    <span class="badge bg-success">{{ $row->status }}</span>
+                                @elseif ($row->status == 'cancelled')
+                                    <span class="badge bg-danger">{{ $row->status }}</span>
+                                @else
+                                    <span class="badge bg-warning">{{ $row->status }}</span>
+                                @endif
+                            </td>
                             <td>
                                 <a class="btn btn-primary" href="{{ route('order.view',$row) }}">{{ __('sidebar.handle') }}</a>
                             </td>
