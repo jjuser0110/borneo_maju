@@ -33,6 +33,7 @@ class User extends Authenticatable
         'point',
         'processing_fees',
         'limit',
+        'idr_limit',
     ];
 
     /**

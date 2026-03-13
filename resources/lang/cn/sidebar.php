@@ -86,6 +86,7 @@ return [
     'agent_username'   => '代理用户名',
     'agent_username_placeholder' => '请输入用户名',
     'limit'            => '限制',
+    'idr_limit'        => '印尼盾汇率限制',
 
     'username'         => '用户名',
     'name'             => '姓名',

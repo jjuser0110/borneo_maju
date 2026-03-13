@@ -39,10 +39,15 @@ class AgentController extends Controller
 
         $rules = [
             'limit' => ['required', 'numeric'],
+            'idr_limit' => ['required', 'numeric'],
         ];
 
         if ($loginUser->role_id !== 1 && !is_null($loginUser->limit)) { // not admin
             $rules['limit'][] = 'max:' . $loginUser->limit;
+        }
+
+        if ($loginUser->role_id !== 1 && !is_null($loginUser->idr_limit)) { // not admin
+            $rules['idr_limit'][] = 'max:' . $loginUser->idr_limit;
         }
 
         $request->validate($rules);
@@ -117,10 +122,15 @@ class AgentController extends Controller
 
         $rules = [
             'limit' => ['required', 'numeric'],
+            'idr_limit' => ['required', 'numeric'],
         ];
 
         if ($user->role_id !== 1 && !is_null($user->limit)) { // not admin
             $rules['limit'][] = 'max:' . $user->limit;
+        }
+
+        if ($user->role_id !== 1 && !is_null($user->idr_limit)) { // not admin
+            $rules['idr_limit'][] = 'max:' . $user->idr_limit;
         }
 
         $request->validate($rules);
@@ -160,6 +170,17 @@ class AgentController extends Controller
 
             $difference = $agent->limit - $request->limit;
             $this->updateDownlines($agent->downlines, 'limit', $difference);
+        }
+
+        if($request->idr_limit != $agent->idr_limit){
+            $agent->save_history()->create([
+                'field_name' => 'idr_limit',
+                'old_value' => $agent->idr_limit,
+                'new_value' => $request->idr_limit,
+            ]);
+
+            $difference = $agent->idr_limit - $request->idr_limit;
+            $this->updateDownlines($agent->downlines, 'idr_limit', $difference);
         }
         $agent->update($request->all());
         return redirect()->route('agent.index')->withSuccess('Data updated');

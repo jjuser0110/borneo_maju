@@ -98,6 +98,21 @@
                         </div>
 
                         <div class="col-md-6">
+                            <label class="form-label" for="idr_limit">{{ __('sidebar.idr_limit') }}
+                                <span class="badge bg-success">{{ __('sidebar.idr_limit') }}: {{ Auth::user()->idr_limit ?? '50' }}</span>
+                            </label>
+                            <input type="number"
+                                   min="1"
+                                   @if (Auth::user()->role_id !== 1 && !is_null(Auth::user()->idr_limit))
+                                       max="{{ Auth::user()->idr_limit }}"
+                                   @endif
+                                   class="form-control"
+                                   name="idr_limit"
+                                   value="{{ $agent->idr_limit ?? '' }}"
+                                   required/>
+                        </div>
+
+                        <div class="col-md-6">
                             <label class="form-label" for="processing_fees">{{ __('sidebar.processing_fees') }}
                                 <span class="badge bg-success">{{ __('sidebar.fees') }}: {{ Auth::user()->processing_fees ?? 'unlimited' }}</span>
                             </label>

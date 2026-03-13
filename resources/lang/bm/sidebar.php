@@ -86,6 +86,7 @@ return [
     'agent_username'   => 'Nama Pengguna Ejen',
     'agent_username_placeholder' => 'Nama Pengguna',
     'limit'            => 'Had',
+    'idr_limit'        => 'Had Kadar IDR',
 
     'username'         => 'Nama Pengguna',
     'name'             => 'Nama',

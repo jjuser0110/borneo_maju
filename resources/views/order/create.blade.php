@@ -80,7 +80,7 @@
                                 class="form-control"
                                 name="idr_rate"
                                 id="idr_rate"
-                                min="0"
+                                min="{{ Auth::user()->idr_rate - Auth::user()->idr_limit }}"
                                 max="{{ Auth::user()->idr_rate ?? 99999999 }}"
                                 value="{{ $order->idr_rate ?? Auth::user()->idr_rate ?? '' }}"
                                 required

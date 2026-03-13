@@ -124,8 +124,13 @@ class OrderController extends Controller
     {
         $loginUser = Auth::user();
 
+        $idr_max = Auth::user()->idr_rate;
+        $idr_limit = Auth::user()->idr_limit ?? 0;
+        $idr_min = $idr_max - $idr_limit;
+
         $request->validate([
-            'myr_amount' => 'required|numeric|min:0|max:' . Auth::user()->limit ?? 5000,
+            'myr_amount'      => 'required|numeric|min:0|max:' . Auth::user()->limit ?? 5000,
+            'idr_rate'        => 'required|numeric|min:' . $idr_min . '|max:' . $idr_max,
             'processing_fees' => 'required|numeric|min:0',
         ]);
 
@@ -189,6 +194,16 @@ class OrderController extends Controller
         if ($loginUser->id !== $order->user_id) {
             return redirect()->route('order.index')->withError('Only the creator can edit this order.');
         }
+
+        $idr_max = Auth::user()->idr_rate;
+        $idr_limit = Auth::user()->idr_limit ?? 0;
+        $idr_min = $idr_max - $idr_limit;
+
+        $request->validate([
+            'myr_amount'      => 'required|numeric|min:0|max:' . Auth::user()->limit ?? 5000,
+            'idr_rate'        => 'required|numeric|min:' . $idr_min . '|max:' . $idr_max,
+            'processing_fees' => 'required|numeric|min:0',
+        ]);
 
         return DB::transaction(function () use ($request, $order, $loginUser) {
 

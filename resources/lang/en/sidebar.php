@@ -86,6 +86,7 @@ return [
     'agent_username'   => 'Agent Username',
     'agent_username_placeholder' => 'Username',
     'limit'            => 'Limit',
+    'idr_limit'        => 'IDR Rate Limit',
 
     'username'         => 'Username',
     'name'             => 'Name',
