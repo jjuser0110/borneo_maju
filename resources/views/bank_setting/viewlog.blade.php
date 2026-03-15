@@ -437,13 +437,9 @@ $(function(){
         isUpdating = false;
     });
 
-    $(document).ready(function () {
-
     let currentBalance = 0;
-
     // When clicking edit icon
-    $('.edit-stock-btn').on('click', function () {
-
+    $(document).on('click', '.edit-stock-btn', function () {
         let stockId = $(this).data('id');
         currentBalance = parseFloat($(this).data('balance'));
 
@@ -456,7 +452,7 @@ $(function(){
     });
 
     // When typing amount
-    $('#edit_amount').on('input', function () {
+    $(document).on('input', '#edit_amount', function () {
 
         let amount = parseFloat($(this).val()) || 0;
         let remaining = currentBalance - amount;
@@ -471,7 +467,5 @@ $(function(){
             $('#remaining_balance').val(remaining.toLocaleString());
         }
     });
-
-});
 </script>
 @endsection
