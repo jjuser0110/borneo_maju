@@ -171,7 +171,18 @@
                                         @if ($order->status == 'completed')
                                             <span class="badge bg-success">{{ $order->status }}</span>
                                         @elseif ($order->status == 'cancelled')
-                                            <span class="badge bg-danger">{{ $order->status }}</span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-danger">{{ $order->status }}</span>
+
+                                                @if(Auth::user()->role_id == 1)
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-warning"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#revertModal">
+                                                        Revert to Completed
+                                                    </button>
+                                                @endif
+                                            </div>
                                         @else
                                             <span class="badge bg-warning">{{ $order->status }}</span>
                                         @endif
@@ -297,6 +308,70 @@
         @endif
     </div>
 </div>
+
+@if(Auth::user()->role_id == 1 && $order->status == 'cancelled')
+<div class="modal fade" id="revertModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="POST" action="{{ route('order.revert_status', $order->id) }}" enctype="multipart/form-data">
+                @csrf
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Revert Cancelled Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" name="status" value="completed">
+
+                    <div class="mb-3">
+                        <label class="form-label">Bank</label>
+                        <select class="form-control" name="bank_setting_id" required>
+                            <option value="">-- Select Bank --</option>
+                            @foreach ($bankSettings as $bankSetting)
+                                <option value="{{ $bankSetting->id }}">
+                                    {{ $bankSetting->owner_name }} (IDR {{ number_format($bankSetting->amount) }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Transfer Cost</label>
+                        <select class="form-control" name="idr_cost_for_transfer">
+                            <option value="0">0</option>
+                            @foreach ($cost as $row)
+                                <option value="{{ $row->idr_cost_for_transfer }}">
+                                    IDR {{ number_format($row->idr_cost_for_transfer) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Remarks</label>
+                        <textarea class="form-control" name="remarks"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Receipt</label>
+                        <input type="file" class="form-control" name="receipt">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Confirm Revert</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 @endsection
 @section('page-js')
 @endsection

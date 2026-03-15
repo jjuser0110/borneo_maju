@@ -13,5 +13,6 @@ Route::prefix('/order')->as('order.')->middleware(['auth'])->group(function() {
     Route::get('/view_details/{order}', 'OrderController@view_details')->name('view_details');
     Route::post('/update/{order}', 'OrderController@update')->name('update');
     Route::post('/pending_update/{order}', 'OrderController@pending_update')->name('pending_update');
+    Route::post('/revert_status/{order}', 'OrderController@revert_status')->name('revert_status');
     Route::get('/destroy/{order}', 'OrderController@destroy')->name('destroy');
 });
