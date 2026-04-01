@@ -169,7 +169,18 @@
                                 <span style="width:100%">
                                     @if((isset($view) && $view) || in_array($order->status, ['completed', 'cancelled']))
                                         @if ($order->status == 'completed')
-                                            <span class="badge bg-success">{{ $order->status }}</span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-success">{{ $order->status }}</span>
+
+                                                @if(Auth::user()->role_id == 1)
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-warning"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#revertToPending">
+                                                        Revert to Pending
+                                                    </button>
+                                                @endif
+                                            </div>
                                         @elseif ($order->status == 'cancelled')
                                             <div class="d-flex align-items-center gap-2">
                                                 <span class="badge bg-danger">{{ $order->status }}</span>
@@ -178,7 +189,7 @@
                                                     <button type="button"
                                                             class="btn btn-sm btn-warning"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#revertModal">
+                                                            data-bs-target="#revertToCompleted">
                                                         Revert to Completed
                                                     </button>
                                                 @endif
@@ -310,7 +321,7 @@
 </div>
 
 @if(Auth::user()->role_id == 1 && $order->status == 'cancelled')
-<div class="modal fade" id="revertModal" tabindex="-1">
+<div class="modal fade" id="revertToCompleted" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
 
@@ -358,6 +369,39 @@
                     <div class="mb-3">
                         <label class="form-label">Receipt</label>
                         <input type="file" class="form-control" name="receipt">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Confirm Revert</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+@elseif (Auth::user()->role_id == 1 && $order->status == 'completed')
+<div class="modal fade" id="revertToPending" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="POST" action="{{ route('order.revert_status', $order->id) }}" enctype="multipart/form-data">
+                @csrf
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Revert Completed Order To Pending</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" name="status" value="pending">
+
+                    <div class="mb-3">
+                        <label class="form-label">Remarks</label>
+                        <textarea class="form-control" name="remarks"></textarea>
                     </div>
 
                 </div>

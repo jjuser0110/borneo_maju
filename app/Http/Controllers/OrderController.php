@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\RunningNumber;
 use Carbon\Carbon;
 use App\Models\Bank;
+use App\Models\BankLog;
 use App\Models\BankSetting;
 use App\Models\Stock;
 use Illuminate\Support\Facades\DB;
@@ -495,7 +496,7 @@ class OrderController extends Controller
         ]);
 
         $capital_used = $order->stock_logs()->sum('capital_used');
-        $profit = $amount_received - $capital_used;
+        $profit = round($amount_received - $capital_used, 2);
         $order->profit()->create([
             'amount_received' => $amount_received,
             'capital_used'    => $capital_used,
@@ -537,6 +538,93 @@ class OrderController extends Controller
                     }
                     $this->processCompletedOrder($request, $order);
 
+                });
+            } catch (\Exception $e) {
+                return back()->withErrors($e->getMessage());
+            }
+
+            return redirect()->route('order.view_details', $order)->withSuccess('Data updated');
+
+        } elseif ($order->status == 'completed' && $request->status == 'pending') {
+            try {
+                DB::transaction(function () use ($request, $order) {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | 1. Restore STOCK
+                    |--------------------------------------------------------------------------
+                    */
+                    foreach ($order->stock_logs as $log) {
+                        $stock = Stock::lockForUpdate()->find($log->stock_id);
+                        if ($stock) {
+                            $stock->increment('idr_balance', $log->idr_amount);
+                        }
+                        $log->delete();
+                    }
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | 2. Restore BANK
+                    |--------------------------------------------------------------------------
+                    */
+                    $bankLog = BankLog::where('bank_setting_id', $order->bank_setting_id)
+                        ->where('type', 'stock_out')
+                        ->where('remarks', 'Order ' . $order->order_no)
+                        ->lockForUpdate()
+                        ->orderBy('id', 'desc')
+                        ->first();
+
+                    if ($bankLog) {
+                        $bank = BankSetting::lockForUpdate()->find($bankLog->bank_setting_id);
+
+                        if ($bank) {
+                            $prev_amount  = $bank->amount;
+                            $amount       = $bankLog->amount;
+                            $after_amount = $prev_amount + $amount;
+
+                            // Restore balance
+                            $bank->update([
+                                'amount' => $after_amount,
+                            ]);
+
+                            // Create reversal log
+                            $bank->bank_logs()->create([
+                                'bank_setting_id' => $bank->id,
+                                'order_id'        => $order->id,
+                                'type'            => 'stock_in',
+                                'remarks'         => 'Reversal of log #' . $bankLog->id,
+                                'prev_amount'     => $prev_amount,
+                                'amount'          => $amount,
+                                'after_amount'    => $after_amount,
+                            ]);
+                        }
+                    }
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | 3. Remove COMMISSION (Order Details)
+                    |--------------------------------------------------------------------------
+                    */
+                    $order->details()->delete();
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | 4. Remove PROFIT
+                    |--------------------------------------------------------------------------
+                    */
+                    $order->profit()->delete();
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | 5. Reset ORDER
+                    |--------------------------------------------------------------------------
+                    */
+                    $order->update([
+                        'status'          => 'pending',
+                        'status_at'       => null,
+                        'status_by_id'    => null,
+                        'remarks'         => $request->remarks,
+                    ]);
                 });
             } catch (\Exception $e) {
                 return back()->withErrors($e->getMessage());
