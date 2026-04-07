@@ -152,14 +152,12 @@ class ReportController extends Controller
         /** ---------------------------
          *  DATE RANGE
          * ---------------------------- */
-        $date = $request->date;
-
-        $date_from = $request->date
-            ? Carbon::parse($request->date)->startOfDay()
+        $date_from = $request->date_from
+            ? Carbon::parse($request->date_from)->startOfDay()
             : Carbon::now()->startOfDay();
 
-        $date_to = $request->date
-            ? Carbon::parse($request->date)->endOfDay()
+        $date_to = $request->date_to
+            ? Carbon::parse($request->date_to)->endOfDay()
             : Carbon::now()->endOfDay();
 
         $stock_in = Stock::where('created_at', '>=', $date_from)
@@ -200,21 +198,23 @@ class ReportController extends Controller
                     ) as total_stock_out
                 ")
             )
-            ->whereDate('created_at', $date)
+            ->where('created_at', '>=', $date_from)
+            ->where('created_at', '<=', $date_to)
             ->groupBy('bank_setting_id')
             ->get()
             ->keyBy('bank_setting_id');
 
-        return view('report.daily_report', compact(
-            'date',
-            'stock_in',
-            'stock_out',
-            'capital_used',
-            'amount_received',
-            'profit',
-            'bankSettings',
-            'bankLogs',
-        ));
+        return view('report.daily_report', [
+            'date_from'         => $date_from->format('Y-m-d'),
+            'date_to'           => $date_to->format('Y-m-d'),
+            'stock_in'          => $stock_in,
+            'stock_out'         => $stock_out,
+            'capital_used'      => $capital_used,
+            'amount_received'   => $amount_received,
+            'profit'            => $profit,
+            'bankSettings'      => $bankSettings,
+            'bankLogs'          => $bankLogs,
+        ]);
     }
 
 }

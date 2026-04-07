@@ -12,7 +12,9 @@
                 <div class="col-md-6 col-12 mb-4">
                     <form method="GET">
                         <div class="input-group input-daterange">
-                            <input type="date" class="form-control" name="date" value="{{ $date ?? date('Y-m-d') }}"/>
+                            <input type="date" class="form-control" name="date_from" value="{{ $date_from ?? '' }}"/>
+                            <span class="input-group-text">{{ __('sidebar.to') }}</span>
+                            <input type="date" class="form-control" name="date_to" value="{{ $date_to ?? '' }}"/>
                             <button class="btn btn-primary" type="submit">{{ __('sidebar.filter') }}</button>
                         </div>
                     </form>
