@@ -1,7 +1,11 @@
 @extends('layouts.app')
 @section('content')
 <!-- Content -->
-
+<style>
+.drag-handle {
+    cursor: move;
+}
+</style>
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="py-3 breadcrumb-wrapper mb-4">
         <span class="text-muted fw-light">{{ __('sidebar.bank_setting') }}</span>
@@ -34,16 +38,19 @@
             <table class="dt-column-search table table-bordered" id="mytable">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>{{ __('sidebar.bank_name') }}</th>
                         <th>{{ __('sidebar.account_no') }}</th>
                         <th>{{ __('sidebar.owner_name') }}</th>
                         <th>{{ __('sidebar.amount') }}</th>
                         <th>{{ __('sidebar.actions') }}</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($bank_setting as $row)
-                    <tr>
+                    <tr data-id="{{ $row->id }}">
+                        <td>{{ $row->position }}</td>
                         <td>{{ $row->bank->bank_name ?? "" }}</td>
                         <td>{{ $row->account_no ?? "" }}</td>
                         <td>{{ $row->owner_name ?? "" }}</td>
@@ -63,6 +70,7 @@
                                 <i class="fa-solid fa-trash"></i>
                             </a>
                         </td>
+                        <td><i class="fa fa-bars drag-handle"></i></td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -114,21 +122,89 @@
         </div>
     </div>
 </div>
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">
+                Order position updated successfully
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+
+    <div id="errorToast" class="toast align-items-center text-bg-danger border-0 mt-2" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">
+                Order position update failed
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('page-js')
 @endsection
 
 @section('scripts')
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
 $(function(){
     var table = $('#mytable').DataTable({
         dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-        pageLength: 10,
-        displayLength: 5,
+        // pageLength: 10,
+        // displayLength: 5,
+        paging: false,
         ordering:false,
-        lengthMenu: [5, 10, 25, 50, 75, 100],
+        // lengthMenu: [5, 10, 25, 50, 75, 100],
     });
+
+    $('#mytable tbody').sortable({
+        handle: ".drag-handle",
+        helper: function(e, tr) {
+            var originals = tr.children();
+            var helper = tr.clone();
+            helper.children().each(function(index) {
+                $(this).width(originals.eq(index).width());
+            });
+            return helper;
+        },
+        stop: function(event, ui) {
+            updateOrder();
+        }
+    });
+
+    function updateOrder(){
+        var order = [];
+
+        $('#mytable tbody tr').each(function(index){
+             let position = index + 1;
+
+            $(this).find('td:first').text(position);
+
+            order.push({
+                id: $(this).data('id'),
+                position: position
+            });
+        });
+
+        $.ajax({
+            url: "{{ route('bank_setting.update_order') }}",
+            method: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                order: order
+            },
+            success: function(response){
+                var toast = new bootstrap.Toast(document.getElementById('successToast'));
+                toast.show();
+            },
+            error: function(){
+                var toast = new bootstrap.Toast(document.getElementById('errorToast'));
+                toast.show();
+            }
+        });
+    }
 });
 
 function openMoneyModal(id){

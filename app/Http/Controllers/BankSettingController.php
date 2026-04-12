@@ -18,7 +18,7 @@ class BankSettingController extends Controller
 {
     public function index(Request $request)
     {
-        $bank_setting = BankSetting::all();
+        $bank_setting = BankSetting::orderBy('position', 'ASC')->get();
 
         return view('bank_setting.index')->with('bank_setting',$bank_setting);
     }
@@ -275,5 +275,17 @@ class BankSettingController extends Controller
 
             return back()->withErrors($e->getMessage());
         }
+    }
+
+    public function updateOrder(Request $request)
+    {
+        DB::transaction(function () use ($request) {
+            foreach ($request->order as $item) {
+                BankSetting::where('id', $item['id'])
+                    ->update(['position' => $item['position']]);
+            }
+        });
+
+        return response()->json(['status' => 'success']);
     }
 }

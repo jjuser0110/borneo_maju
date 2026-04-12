@@ -14,6 +14,7 @@ Route::prefix('/bank_setting')->as('bank_setting.')->middleware(['auth'])->group
     Route::get('/viewlog/{bank_setting}', 'BankSettingController@viewlog')->name('viewlog');
     Route::post('/add-stock', 'BankSettingController@addStock')->name('addStock');
     Route::post('/update-stock-balance', 'BankSettingController@updateStockBalance')->name('update_stock_balance');
+    Route::post('/update-order', 'BankSettingController@updateOrder')->name('update_order');
 
     Route::get('/view-stock-log/{stock}', 'BankSettingController@view_stock_log')->name('view_stock_log');
     Route::get('/destroy-stock/{stock}', 'BankSettingController@destroy_stock')->name('destroy_stock');

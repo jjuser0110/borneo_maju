@@ -18,6 +18,7 @@ class BankSetting extends Model
         'is_active',
         'capital',
         'amount',
+        'position',
     ];
 
     public function bank()

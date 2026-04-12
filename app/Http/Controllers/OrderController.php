@@ -70,7 +70,9 @@ class OrderController extends Controller
         if ($order->status == 'pending') {
             $order->update(['status'=>'processing']);
         }
-        $bankSettings = BankSetting::where('is_active', 1)->get();
+        $bankSettings = BankSetting::where('is_active', 1)
+            ->orderBy('position', 'ASC')
+            ->get();
         $cost = Cost::all();
 
         return view('order.view')->with('order',$order)->with('bankSettings', $bankSettings)->with('cost', $cost);
@@ -80,7 +82,9 @@ class OrderController extends Controller
     {
         $loginUser = Auth::user();
         $view = true;
-        $bankSettings = BankSetting::where('is_active', 1)->get();
+        $bankSettings = BankSetting::where('is_active', 1)
+            ->orderBy('position', 'ASC')
+            ->get();
         $cost = Cost::all();
 
         return view('order.view')->with('order',$order)->with('bankSettings', $bankSettings)->with('cost', $cost)->with('view', $view);

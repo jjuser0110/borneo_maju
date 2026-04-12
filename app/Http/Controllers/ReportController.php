@@ -177,7 +177,7 @@ class ReportController extends Controller
         $amount_received  = $profits->sum('amount_received');
         $profit           = $profits->sum('profit');
 
-        $bankSettings = BankSetting::all();
+        $bankSettings = BankSetting::orderBy('position', 'ASC')->get();
         $bankLogs = BankLog::select(
                 'bank_setting_id',
                 DB::raw("
