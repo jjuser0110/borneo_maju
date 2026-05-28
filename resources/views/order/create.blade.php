@@ -119,6 +119,7 @@
                                 class="form-control"
                                 name="processing_fees"
                                 min="{{ Auth::user()->processing_fees ?? 0 }}"
+                                max="30"
                                 step="0.01"
                                 value="{{ $order->processing_fees ?? Auth::user()->processing_fees ?? '' }}"
                                 required

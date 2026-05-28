@@ -118,6 +118,7 @@
                             </label>
                             <input type="number"
                                    min="{{ Auth::user()->processing_fees ?? '1' }}"
+                                   max="30"
                                    class="form-control"
                                    name="processing_fees"
                                    value="{{ $agent->processing_fees ?? '' }}"
