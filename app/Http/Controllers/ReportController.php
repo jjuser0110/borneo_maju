@@ -85,8 +85,8 @@ class ReportController extends Controller
         $my_order = $login_user->orders()
             ->where('status', 'completed')
             ->whereBetween('order_datetime', [$date_from, $date_to])
-            ->withSum('orderDetails', 'do_up')
-            ->withSum('orderDetails', 'profit')
+            ->withSum('order_details', 'do_up')
+            ->withSum('order_details', 'profit')
             ->get();
 
         /** ---------------------------
