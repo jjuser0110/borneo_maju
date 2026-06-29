@@ -28,6 +28,7 @@ class ReportController extends Controller
          *  LOGIN USER
          * ---------------------------- */
         if ($request->user_id > 0) {
+            abort_unless(Auth::user()->role_id == 1, 403);
             $login_user = User::findOrFail($request->user_id);
         } else {
             $login_user = Auth::user();
@@ -57,7 +58,12 @@ class ReportController extends Controller
         /** ---------------------------
          *  AGENTS WITH TOTALS
          * ---------------------------- */
-        $completedInRange = function ($q) use ($date_from, $date_to) {
+        $completedOrdersInRange = function ($q) use ($date_from, $date_to) {
+            $q->whereBetween('order_datetime', [$date_from, $date_to])
+            ->where('status', 'completed');
+        };
+
+        $completedDetailsInRange = function ($q) use ($date_from, $date_to) {
             $q->whereHas('order', function ($o) use ($date_from, $date_to) {
                 $o->whereBetween('order_datetime', [$date_from, $date_to])
                 ->where('status', 'completed');
@@ -65,12 +71,12 @@ class ReportController extends Controller
         };
 
         $agents = $agentsQuery
-            ->withCount(['order as total_order' => $completedInRange])
-            ->withSum(['order as total_idr'              => $completedInRange], 'idr_amount')
-            ->withSum(['order as total_myr'              => $completedInRange], 'myr_amount')
-            ->withSum(['order as total_processing_fees'  => $completedInRange], 'processing_fees')
-            ->withSum(['order_details as total_do_up'            => $completedInRange], 'do_up')
-            ->withSum(['order_details as total_agent_do_up'      => $completedInRange], 'agent_do_up')
+            ->withCount(['orders as total_order'                        => $completedOrdersInRange])
+            ->withSum(['orders as total_idr'                            => $completedOrdersInRange], 'idr_amount')
+            ->withSum(['orders as total_myr'                            => $completedOrdersInRange], 'myr_amount')
+            ->withSum(['orders as total_processing_fees'                => $completedOrdersInRange], 'processing_fees')
+            ->withSum(['order_details as total_do_up'                   => $completedDetailsInRange], 'do_up')
+            ->withSum(['order_details as total_agent_do_up'             => $completedDetailsInRange], 'agent_do_up')
             ->get();
 
         /** ---------------------------
