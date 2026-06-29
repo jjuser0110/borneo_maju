@@ -75,8 +75,8 @@ class ReportController extends Controller
             ->withSum(['orders as total_idr'                   => $completedOrdersInRange], 'idr_amount')
             ->withSum(['orders as total_myr'                   => $completedOrdersInRange], 'myr_amount')
             ->withSum(['orders as total_processing_fees'       => $completedOrdersInRange], 'processing_fees')
-            ->withSum(['order_details as total_do_up'           => $completedDetailsInRange], 'do_up')
-            ->withSum(['order_details as total_agent_do_up'     => $completedDetailsInRange], 'agent_do_up')
+            ->withSum(['orderDetails as total_do_up'           => $completedDetailsInRange], 'do_up')
+            ->withSum(['orderDetails as total_agent_do_up'     => $completedDetailsInRange], 'agent_do_up')
             ->get();
 
         /** ---------------------------
@@ -85,8 +85,8 @@ class ReportController extends Controller
         $my_order = $login_user->orders()
             ->where('status', 'completed')
             ->whereBetween('order_datetime', [$date_from, $date_to])
-            ->withSum('order_details', 'do_up')
-            ->withSum('order_details', 'profit')
+            ->withSum('orderDetails', 'do_up')
+            ->withSum('orderDetails', 'profit')
             ->get();
 
         /** ---------------------------
