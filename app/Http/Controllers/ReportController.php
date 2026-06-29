@@ -71,12 +71,12 @@ class ReportController extends Controller
         };
 
         $agents = $agentsQuery
-            ->withCount(['orders as total_order'                        => $completedOrdersInRange])
-            ->withSum(['orders as total_idr'                            => $completedOrdersInRange], 'idr_amount')
-            ->withSum(['orders as total_myr'                            => $completedOrdersInRange], 'myr_amount')
-            ->withSum(['orders as total_processing_fees'                => $completedOrdersInRange], 'processing_fees')
-            ->withSum(['order_details as total_do_up'                   => $completedDetailsInRange], 'do_up')
-            ->withSum(['order_details as total_agent_do_up'             => $completedDetailsInRange], 'agent_do_up')
+            ->withCount(['orders as total_order'               => $completedOrdersInRange])
+            ->withSum(['orders as total_idr'                   => $completedOrdersInRange], 'idr_amount')
+            ->withSum(['orders as total_myr'                   => $completedOrdersInRange], 'myr_amount')
+            ->withSum(['orders as total_processing_fees'       => $completedOrdersInRange], 'processing_fees')
+            ->withSum(['details as total_do_up'           => $completedDetailsInRange], 'do_up')
+            ->withSum(['details as total_agent_do_up'     => $completedDetailsInRange], 'agent_do_up')
             ->get();
 
         /** ---------------------------
