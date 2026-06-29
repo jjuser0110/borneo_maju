@@ -57,55 +57,20 @@ class ReportController extends Controller
         /** ---------------------------
          *  AGENTS WITH TOTALS
          * ---------------------------- */
+        $completedInRange = function ($q) use ($date_from, $date_to) {
+            $q->whereHas('order', function ($o) use ($date_from, $date_to) {
+                $o->whereBetween('order_datetime', [$date_from, $date_to])
+                ->where('status', 'completed');
+            });
+        };
+
         $agents = $agentsQuery
-            ->withCount([
-                'order_details as total_order' => function ($q) use ($date_from, $date_to) {
-                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
-                        $o->whereBetween('order_datetime', [$date_from, $date_to])
-                        ->where('status', 'completed');
-                    });
-                }
-            ])
-            ->withSum([
-                'order_details as total_idr' => function ($q) use ($date_from, $date_to) {
-                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
-                        $o->whereBetween('order_datetime', [$date_from, $date_to])
-                        ->where('status', 'completed');
-                    });
-                }
-            ], 'idr_amount')
-            ->withSum([
-                'order_details as total_myr' => function ($q) use ($date_from, $date_to) {
-                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
-                        $o->whereBetween('order_datetime', [$date_from, $date_to])
-                        ->where('status', 'completed');
-                    });
-                }
-            ], 'myr_amount')
-            ->withSum([
-                'order_details as total_processing_fees' => function ($q) use ($date_from, $date_to) {
-                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
-                        $o->whereBetween('order_datetime', [$date_from, $date_to])
-                        ->where('status', 'completed');
-                    });
-                }
-            ], 'processing_fees')
-            ->withSum([
-                'order_details as total_do_up' => function ($q) use ($date_from, $date_to) {
-                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
-                        $o->whereBetween('order_datetime', [$date_from, $date_to])
-                        ->where('status', 'completed');
-                    });
-                }
-            ], 'do_up')
-            ->withSum([
-                'order_details as total_agent_do_up' => function ($q) use ($date_from, $date_to) {
-                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
-                        $o->whereBetween('order_datetime', [$date_from, $date_to])
-                        ->where('status', 'completed');
-                    });
-                }
-            ], 'agent_do_up')
+            ->withCount(['order as total_order' => $completedInRange])
+            ->withSum(['order as total_idr'              => $completedInRange], 'idr_amount')
+            ->withSum(['order as total_myr'              => $completedInRange], 'myr_amount')
+            ->withSum(['order as total_processing_fees'  => $completedInRange], 'processing_fees')
+            ->withSum(['order_details as total_do_up'            => $completedInRange], 'do_up')
+            ->withSum(['order_details as total_agent_do_up'      => $completedInRange], 'agent_do_up')
             ->get();
 
         /** ---------------------------
