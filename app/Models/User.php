@@ -85,16 +85,6 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Order');
     }
 
-    public function orderDetails()
-    {
-        return $this->hasManyThrough(
-            OrderDetail::class,
-            Order::class,
-            'user_id',  // FK on orders
-            'order_id', // FK on order_details
-        );
-    }
-
     public function uplineUser()
     {
         return $this->belongsTo(User::class, 'upline');
