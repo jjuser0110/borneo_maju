@@ -28,7 +28,6 @@ class ReportController extends Controller
          *  LOGIN USER
          * ---------------------------- */
         if ($request->user_id > 0) {
-            abort_unless(Auth::user()->role_id == 1, 403);
             $login_user = User::findOrFail($request->user_id);
         } else {
             $login_user = Auth::user();
@@ -58,25 +57,55 @@ class ReportController extends Controller
         /** ---------------------------
          *  AGENTS WITH TOTALS
          * ---------------------------- */
-        $completedOrdersInRange = function ($q) use ($date_from, $date_to) {
-            $q->whereBetween('order_datetime', [$date_from, $date_to])
-            ->where('status', 'completed');
-        };
-
-        $completedDetailsInRange = function ($q) use ($date_from, $date_to) {
-            $q->whereHas('order', function ($o) use ($date_from, $date_to) {
-                $o->whereBetween('order_datetime', [$date_from, $date_to])
-                ->where('status', 'completed');
-            });
-        };
-
         $agents = $agentsQuery
-            ->withCount(['orders as total_order'               => $completedOrdersInRange])
-            ->withSum(['orders as total_idr'                   => $completedOrdersInRange], 'idr_amount')
-            ->withSum(['orders as total_myr'                   => $completedOrdersInRange], 'myr_amount')
-            ->withSum(['orders as total_processing_fees'       => $completedOrdersInRange], 'processing_fees')
-            ->withSum(['orderDetails as total_do_up'           => $completedDetailsInRange], 'do_up')
-            ->withSum(['orderDetails as total_agent_do_up'     => $completedDetailsInRange], 'agent_do_up')
+            ->withCount([
+                'order_details as total_order' => function ($q) use ($date_from, $date_to) {
+                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
+                        $o->whereBetween('order_datetime', [$date_from, $date_to])
+                        ->where('status', 'completed');
+                    });
+                }
+            ])
+            ->withSum([
+                'order_details as total_idr' => function ($q) use ($date_from, $date_to) {
+                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
+                        $o->whereBetween('order_datetime', [$date_from, $date_to])
+                        ->where('status', 'completed');
+                    });
+                }
+            ], 'idr_amount')
+            ->withSum([
+                'order_details as total_myr' => function ($q) use ($date_from, $date_to) {
+                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
+                        $o->whereBetween('order_datetime', [$date_from, $date_to])
+                        ->where('status', 'completed');
+                    });
+                }
+            ], 'myr_amount')
+            ->withSum([
+                'order_details as total_processing_fees' => function ($q) use ($date_from, $date_to) {
+                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
+                        $o->whereBetween('order_datetime', [$date_from, $date_to])
+                        ->where('status', 'completed');
+                    });
+                }
+            ], 'processing_fees')
+            ->withSum([
+                'order_details as total_do_up' => function ($q) use ($date_from, $date_to) {
+                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
+                        $o->whereBetween('order_datetime', [$date_from, $date_to])
+                        ->where('status', 'completed');
+                    });
+                }
+            ], 'do_up')
+            ->withSum([
+                'order_details as total_agent_do_up' => function ($q) use ($date_from, $date_to) {
+                    $q->whereHas('order', function ($o) use ($date_from, $date_to) {
+                        $o->whereBetween('order_datetime', [$date_from, $date_to])
+                        ->where('status', 'completed');
+                    });
+                }
+            ], 'agent_do_up')
             ->get();
 
         /** ---------------------------
