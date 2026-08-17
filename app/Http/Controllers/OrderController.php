@@ -450,7 +450,7 @@ class OrderController extends Controller
         while ($qty_needed > 0) {
             $stock = Stock::where('bank_setting_id', $bank_setting->id)
                 ->where('idr_balance', '>', 0)
-                ->orderBy('created_at', 'ASC')
+                ->orderBy('idr_rate', 'ASC')
                 ->lockForUpdate()
                 ->first();
 
