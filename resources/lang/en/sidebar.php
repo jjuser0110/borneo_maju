@@ -195,4 +195,5 @@ return [
     'remaining_balance' => 'Remaining Balance (IDR)',
     'amount_exceeds_available_balance' => 'Amount exceeds available balance',
     'select_type' => 'Select Type',
+    'my_rate' => 'My Rate',
 ];

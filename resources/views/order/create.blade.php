@@ -130,6 +130,19 @@
                             </label>
                             <textarea class="form-control" name="order_remarks">{{ $order->remarks ?? '' }}</textarea>
                         </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{{ __('sidebar.my_rate') }}</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="my_idr_rate"
+                                id="my_idr_rate"
+                                min="0"
+                                value="{{ $order->my_idr_rate ?? Auth::user()->idr_rate ?? '' }}"
+                                required
+                                readonly
+                            />
+                        </div>
                         <hr>
                         <div class="col-12" style="text-align:right">
                             <button type="submit" name="submitButton" class="btn btn-primary">{{ __('sidebar.submit') }}</button>

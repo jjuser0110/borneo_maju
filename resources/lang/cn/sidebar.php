@@ -195,4 +195,5 @@ return [
     'remaining_balance' => '剩余余额 (IDR)',
     'amount_exceeds_available_balance' => '超出可用余额的金额',
     'select_type' => '选择类型',
+    'my_rate' => '我的汇率',
 ];

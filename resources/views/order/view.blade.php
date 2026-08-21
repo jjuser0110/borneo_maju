@@ -156,7 +156,7 @@
             <!-- Profile Overview -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <form method="POST" action="{{ route('order.pending_update', $order->id) }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('order.pending_update', $order->id) }}" enctype="multipart/form-data" onsubmit="showLoading()">
                         @csrf
                         <p class="card-text text-uppercase">{{ __('sidebar.work') }}</p>
                         <ul class="list-unstyled mb-0">

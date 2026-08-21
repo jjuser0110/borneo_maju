@@ -195,4 +195,5 @@ return [
     'remaining_balance' => 'Baki Tinggal (IDR)',
     'amount_exceeds_available_balance' => 'Amaun melebihi baki yang tersedia',
     'select_type' => 'Pilih Jenis',
+    'my_rate' => 'Kadar Saya',
 ];

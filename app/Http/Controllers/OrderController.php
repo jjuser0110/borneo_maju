@@ -178,6 +178,50 @@ class OrderController extends Controller
 
             $loginUser->update(['point' => $point_after]);
 
+            $idrAmount   = $order->idr_amount;
+            $orderTotal  = $order->total_amount;
+
+            // Start from order owner
+            $currentUser = $order->user;
+            $amount_received = 0;
+
+            while ($currentUser) {
+                if($currentUser->role_id == 1){
+                    // Admin does not get commission
+                    break;
+                }
+                $myrAmount = round($idrAmount / $currentUser->idr_rate, 2);
+                $totalAmount = round($myrAmount + $currentUser->processing_fees, 2);
+                $profit = round($orderTotal - $totalAmount, 2);
+
+                $order_details = OrderDetail::create([
+                    'order_id'         => $order->id,
+                    'user_id'          => $currentUser->id,
+                    'idr_amount'       => $idrAmount,
+                    'idr_rate'         => $currentUser->idr_rate,
+                    'myr_amount'       => $myrAmount,
+                    'processing_fees'  => $currentUser->processing_fees,
+                    'total_amount'     => $totalAmount,
+                    'upline'           => $currentUser->upline,
+                    'do_up'            => $totalAmount,
+                    'profit'           => $profit,
+                ]);
+
+                // Move up
+                $orderTotal = $totalAmount;
+                $currentUser = $currentUser->uplineUser;
+
+                if($currentUser && $currentUser->role_id != 1){
+                    $myrAmount2 = round($idrAmount / $currentUser->idr_rate, 2);
+                    $totalAmount2 = round($myrAmount2 + $currentUser->processing_fees, 2);
+                    $order_details->update([
+                        'agent_do_up' => $totalAmount2,
+                    ]);
+                } else {
+                    $amount_received = $order_details->do_up;
+                }
+            }
+
             return redirect()->route('order.index')->withSuccess('Data saved');
         });
     }
@@ -289,12 +333,12 @@ class OrderController extends Controller
 
             try {
                 DB::transaction(function () use ($request, $order) {
-                    if ($order->stock_logs()->exists()) {
-                        throw new \Exception('Order stock already processed.');
-                    }
-                    if ($order->details()->exists()) {
-                        throw new \Exception('Order commission already processed.');
-                    }
+                    // if ($order->stock_logs()->exists()) {
+                    //     throw new \Exception('Order stock already processed.');
+                    // }
+                    // if ($order->details()->exists()) {
+                    //     throw new \Exception('Order commission already processed.');
+                    // }
                     $this->processCompletedOrder($request, $order);
                 });
             } catch (\Exception $e) {
@@ -403,45 +447,45 @@ class OrderController extends Controller
         $orderTotal  = $order->total_amount;
 
         // Start from order owner
-        $currentUser = $order->user;
-        $amount_received = 0;
+        // $currentUser = $order->user;
+        // $amount_received = 0;
 
-        while ($currentUser) {
-            if($currentUser->role_id == 1){
-                // Admin does not get commission
-                break;
-            }
-            $myrAmount = round($idrAmount / $currentUser->idr_rate, 2);
-            $totalAmount = round($myrAmount + $currentUser->processing_fees, 2);
-            $profit = round($orderTotal - $totalAmount, 2);
+        // while ($currentUser) {
+        //     if($currentUser->role_id == 1){
+        //         // Admin does not get commission
+        //         break;
+        //     }
+        //     $myrAmount = round($idrAmount / $currentUser->idr_rate, 2);
+        //     $totalAmount = round($myrAmount + $currentUser->processing_fees, 2);
+        //     $profit = round($orderTotal - $totalAmount, 2);
 
-            $order_details = OrderDetail::create([
-                'order_id'         => $order->id,
-                'user_id'          => $currentUser->id,
-                'idr_amount'       => $idrAmount,
-                'idr_rate'         => $currentUser->idr_rate,
-                'myr_amount'       => $myrAmount,
-                'processing_fees'  => $currentUser->processing_fees,
-                'total_amount'     => $totalAmount,
-                'upline'           => $currentUser->upline,
-                'do_up'            => $totalAmount,
-                'profit'           => $profit,
-            ]);
+        //     $order_details = OrderDetail::create([
+        //         'order_id'         => $order->id,
+        //         'user_id'          => $currentUser->id,
+        //         'idr_amount'       => $idrAmount,
+        //         'idr_rate'         => $currentUser->idr_rate,
+        //         'myr_amount'       => $myrAmount,
+        //         'processing_fees'  => $currentUser->processing_fees,
+        //         'total_amount'     => $totalAmount,
+        //         'upline'           => $currentUser->upline,
+        //         'do_up'            => $totalAmount,
+        //         'profit'           => $profit,
+        //     ]);
 
-            // Move up
-            $orderTotal = $totalAmount;
-            $currentUser = $currentUser->uplineUser;
+        //     // Move up
+        //     $orderTotal = $totalAmount;
+        //     $currentUser = $currentUser->uplineUser;
 
-            if($currentUser && $currentUser->role_id != 1){
-                $myrAmount2 = round($idrAmount / $currentUser->idr_rate, 2);
-                $totalAmount2 = round($myrAmount2 + $currentUser->processing_fees, 2);
-                $order_details->update([
-                    'agent_do_up' => $totalAmount2,
-                ]);
-            } else {
-                $amount_received = $order_details->do_up;
-            }
-        }
+        //     if($currentUser && $currentUser->role_id != 1){
+        //         $myrAmount2 = round($idrAmount / $currentUser->idr_rate, 2);
+        //         $totalAmount2 = round($myrAmount2 + $currentUser->processing_fees, 2);
+        //         $order_details->update([
+        //             'agent_do_up' => $totalAmount2,
+        //         ]);
+        //     } else {
+        //         $amount_received = $order_details->do_up;
+        //     }
+        // }
 
         $transferCost = $request->idr_cost_for_transfer ?? 0;
         $qty_needed = $idrAmount + $transferCost;
@@ -500,6 +544,7 @@ class OrderController extends Controller
         ]);
 
         $capital_used = $order->stock_logs()->sum('capital_used');
+        $amount_received = OrderDetail::where('order_id', $order->id)->orderBy('id', 'desc')->first()->do_up ?? 0;
         $profit = round($amount_received - $capital_used, 2);
         $order->profit()->create([
             'amount_received' => $amount_received,

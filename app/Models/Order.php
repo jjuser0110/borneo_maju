@@ -30,7 +30,8 @@ class Order extends Model
         'bank_setting_id',
         'remarks',
         'order_remarks',
-        'idr_cost_for_transfer'
+        'idr_cost_for_transfer',
+        'my_idr_rate',
     ];
 
     public function bank()
