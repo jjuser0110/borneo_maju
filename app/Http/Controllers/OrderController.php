@@ -131,6 +131,11 @@ class OrderController extends Controller
     {
         $loginUser = Auth::user();
 
+        $existingOrder = Order::where('order_no', $request->order_no)->first();
+        if ($existingOrder) {
+            return redirect()->route('order.index')->withError('This order has already been submitted.');
+        }
+
         $idr_max = Auth::user()->idr_rate;
         $idr_limit = Auth::user()->idr_limit ?? 0;
         $idr_min = $idr_max - $idr_limit;
@@ -146,6 +151,10 @@ class OrderController extends Controller
         }
 
         return DB::transaction(function () use ($request, $loginUser) {
+
+            if (Order::where('order_no', $request->order_no)->exists()) {
+                return redirect()->route('order.index')->withError('This order has already been submitted.');
+            }
 
             $total_amount = round($request->myr_amount + $request->processing_fees, 2);
 
