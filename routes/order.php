@@ -15,4 +15,5 @@ Route::prefix('/order')->as('order.')->middleware(['auth'])->group(function() {
     Route::post('/pending_update/{order}', 'OrderController@pending_update')->name('pending_update');
     Route::post('/revert_status/{order}', 'OrderController@revert_status')->name('revert_status');
     Route::get('/destroy/{order}', 'OrderController@destroy')->name('destroy');
+    Route::get('/update-order-details/{order}', 'OrderController@updateOrderDetails')->name('updateOrderDetails');
 });

@@ -255,12 +255,12 @@ class OrderController extends Controller
             return redirect()->route('order.index')->withError('Only the creator can edit this order.');
         }
 
-        $idr_max = Auth::user()->idr_rate;
-        $idr_limit = Auth::user()->idr_limit ?? 0;
+        $idr_max = $loginUser->idr_rate;
+        $idr_limit = $loginUser->idr_limit ?? 0;
         $idr_min = $idr_max - $idr_limit;
 
         $request->validate([
-            'myr_amount'      => 'required|numeric|min:0|max:' . Auth::user()->limit ?? 5000,
+            'myr_amount'      => 'required|numeric|min:0|max:' . ($loginUser->limit ?? 5000),
             'idr_rate'        => 'required|numeric|min:' . $idr_min . '|max:' . $idr_max,
             'processing_fees' => 'required|numeric|min:0',
         ]);
@@ -288,8 +288,55 @@ class OrderController extends Controller
 
             $loginUser->update(['point' => $point_after]);
 
+            // Recalculate all existing OrderDetail records
+            $this->updateOrderDetails($order->fresh());
+
             return redirect()->route('order.index')->withSuccess('Data updated');
         });
+    }
+
+    public function updateOrderDetails(Order $order)
+    {
+        $idrAmount   = $order->idr_amount;
+        $orderTotal  = $order->total_amount;
+
+        foreach ($order->details as $order_detail) {
+
+            $currentUser = $order_detail->user;
+
+             if (!$currentUser) {
+                continue;
+            }
+
+            $myrAmount = round($idrAmount / $currentUser->idr_rate, 2);
+            $totalAmount = round($myrAmount + $currentUser->processing_fees, 2);
+            $profit = round($orderTotal - $totalAmount, 2);
+
+
+            $order_detail->update([
+                'idr_amount'       => $idrAmount,
+                'idr_rate'         => $currentUser->idr_rate,
+                'myr_amount'       => $myrAmount,
+                'processing_fees'  => $currentUser->processing_fees,
+                'total_amount'     => $totalAmount,
+                'upline'           => $currentUser->upline,
+                'do_up'            => $totalAmount,
+                'profit'           => $profit,
+            ]);
+
+            $orderTotal = $totalAmount;
+            $currentUser = $currentUser->uplineUser;
+
+            if($currentUser && $currentUser->role_id != 1){
+                $myrAmount2 = round($idrAmount / $currentUser->idr_rate, 2);
+                $totalAmount2 = round($myrAmount2 + $currentUser->processing_fees, 2);
+                $order_detail->update([
+                    'agent_do_up' => $totalAmount2,
+                ]);
+            }
+        }
+
+        return 'done';
     }
 
     public function destroy(Order $order)
