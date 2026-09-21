@@ -308,16 +308,23 @@ class OrderController extends Controller
                 continue;
             }
 
-            $myrAmount = round($idrAmount / $currentUser->idr_rate, 2);
-            $totalAmount = round($myrAmount + $currentUser->processing_fees, 2);
+            if ($order->user == $order_detail->user) {
+                $idr_rate = $order->idr_rate;
+                $processing_fees = $order->processing_fees;
+            } else {
+                $idr_rate = $order_detail->idr_rate;
+                $processing_fees = $order_detail->processing_fees;
+            }
+            $myrAmount = round($idrAmount / $idr_rate, 2);
+            $totalAmount = round($myrAmount + $processing_fees, 2);
             $profit = round($orderTotal - $totalAmount, 2);
 
 
             $order_detail->update([
                 'idr_amount'       => $idrAmount,
-                'idr_rate'         => $currentUser->idr_rate,
+                'idr_rate'         => $idr_rate,
                 'myr_amount'       => $myrAmount,
-                'processing_fees'  => $currentUser->processing_fees,
+                'processing_fees'  => $processing_fees,
                 'total_amount'     => $totalAmount,
                 'upline'           => $currentUser->upline,
                 'do_up'            => $totalAmount,
@@ -325,14 +332,20 @@ class OrderController extends Controller
             ]);
 
             $orderTotal = $totalAmount;
-            $currentUser = $currentUser->uplineUser;
+            $nextUser = $currentUser->uplineUser;
 
-            if($currentUser && $currentUser->role_id != 1){
-                $myrAmount2 = round($idrAmount / $currentUser->idr_rate, 2);
-                $totalAmount2 = round($myrAmount2 + $currentUser->processing_fees, 2);
-                $order_detail->update([
-                    'agent_do_up' => $totalAmount2,
-                ]);
+            if ($nextUser && $nextUser->role_id != 1) {
+                $next_order_detail = $order->details()
+                    ->where('user_id', $nextUser->id)
+                    ->first();
+
+                if ($next_order_detail) {
+                    $myrAmount2 = round($idrAmount / $next_order_detail->idr_rate, 2);
+                    $totalAmount2 = round($myrAmount2 + $next_order_detail->processing_fees, 2);
+                    $order_detail->update([
+                        'agent_do_up' => $totalAmount2,
+                    ]);
+                }
             }
         }
 
