@@ -196,4 +196,8 @@ return [
     'amount_exceeds_available_balance' => 'Amaun melebihi baki yang tersedia',
     'select_type' => 'Pilih Jenis',
     'my_rate' => 'Kadar Saya',
+    'editRate' => 'Sunting Kadar',
+    'current_rate' => 'Kadar Semasa (IDR)',
+    'new_rate' => 'Kadar Baharu (IDR)',
+    'invalid_rate' => 'Kadar Tidak Sah',
 ];

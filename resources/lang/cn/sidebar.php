@@ -196,4 +196,8 @@ return [
     'amount_exceeds_available_balance' => '超出可用余额的金额',
     'select_type' => '选择类型',
     'my_rate' => '我的汇率',
+    'editRate' => '编辑汇率',
+    'current_rate' => '当前汇率 (IDR)',
+    'new_rate' => '新汇率 (IDR)',
+    'invalid_rate' => '无效的汇率',
 ];

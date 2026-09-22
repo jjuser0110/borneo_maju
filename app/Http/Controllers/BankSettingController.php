@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use App\Models\Bank;
 use App\Models\BankSetting;
 use App\Models\Stock;
+use App\Models\Profit;
+use App\Models\StockLog;
+
 use Bouncer;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -87,23 +90,79 @@ class BankSettingController extends Controller
 
     public function viewlog(Request $request, BankSetting $bank_setting)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Stocks
+        |--------------------------------------------------------------------------
+        | Default newest stock first.
+        | DataTables can then sort the loaded rows by Balance, MYR, IDR, etc.
+        */
+
+        $stocks = $bank_setting->stocks()
+            ->orderByDesc('created_at')
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Bank Logs
+        |--------------------------------------------------------------------------
+        | Default date range = today
+        */
+
+        $dateFrom = $request->input('date_from', now()->toDateString());
+        $dateTo   = $request->input('date_to', now()->toDateString());
+
         $types = $request->input('type', []);
 
+        // Make sure type is always an array
+        if (!is_array($types)) {
+            $types = [$types];
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Date Range
+        |--------------------------------------------------------------------------
+        | Using startOfDay/endOfDay instead of whereDate().
+        | This is better especially when created_at is indexed.
+        */
+
+        $startDate = \Carbon\Carbon::parse($dateFrom)->startOfDay();
+        $endDate   = \Carbon\Carbon::parse($dateTo)->endOfDay();
+
+
         $bank_logs = $bank_setting->bank_logs()
-            ->when($request->date, function ($query) use ($request) {
-                $query->whereDate('created_at', $request->date);
-            })
+            ->whereBetween('created_at', [
+                $startDate,
+                $endDate
+            ])
+
             ->when(!empty($types), function ($query) use ($types) {
                 $query->whereIn('type', $types);
             })
-            ->latest()
+
+            ->orderByDesc('created_at')
             ->get()
+
             ->map(function ($log) {
-                $log->signed_amount = $log->after_amount - $log->prev_amount;
+
+                $log->signed_amount =
+                    $log->after_amount - $log->prev_amount;
+
                 return $log;
             });
 
-        return view('bank_setting.viewlog', compact('bank_setting', 'bank_logs'));
+
+        return view('bank_setting.viewlog', compact(
+            'bank_setting',
+            'stocks',
+            'bank_logs',
+            'dateFrom',
+            'dateTo',
+            'types'
+        ));
     }
 
     public function addStock(Request $request)
@@ -287,5 +346,58 @@ class BankSettingController extends Controller
         });
 
         return response()->json(['status' => 'success']);
+    }
+
+    public function editRate(Request $request)
+    {
+        DB::transaction(function () use ($request) {
+
+            $stock = Stock::with('stock_logs')
+                ->findOrFail($request->stock_id);
+
+            $newRate = (float) $request->new_rate;
+
+            $newMyrAmount = round(
+                $stock->idr_amount / $newRate,
+                2
+            );
+
+            $stock->update([
+                'idr_rate'  => $newRate,
+                'myr_amount' => $newMyrAmount,
+            ]);
+
+            foreach ($stock->stock_logs as $log) {
+
+                $capitalUsed = round(
+                    $log->idr_amount / $newRate,
+                    2
+                );
+
+                $log->update([
+                    'stock_idr_rate' => $newRate,
+                    'capital_used'   => $capitalUsed,
+                ]);
+
+                $profit = Profit::where('order_id', $log->order_id)
+                    ->first();
+
+                if ($profit) {
+                    $allCapitalUsed = StockLog::where('order_id', $log->order_id)
+                        ->sum('capital_used');
+                    $profitAmount = round(
+                        $profit->amount_received - $allCapitalUsed,
+                        2
+                    );
+
+                    $profit->update([
+                        'capital_used' => $allCapitalUsed,
+                        'profit'       => $profitAmount,
+                    ]);
+                }
+            }
+        });
+
+        return back()->withSuccess('Rate updated successfully');
     }
 }

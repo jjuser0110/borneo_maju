@@ -196,4 +196,8 @@ return [
     'amount_exceeds_available_balance' => 'Amount exceeds available balance',
     'select_type' => 'Select Type',
     'my_rate' => 'My Rate',
+    'editRate' => 'Edit Rate',
+    'current_rate' => 'Current Rate (IDR)',
+    'new_rate' => 'New Rate (IDR)',
+    'invalid_rate' => 'Invalid Rate',
 ];
