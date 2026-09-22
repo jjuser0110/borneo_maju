@@ -308,13 +308,9 @@ class OrderController extends Controller
                 continue;
             }
 
-            if ($order->user == $order_detail->user) {
-                $idr_rate = $order->idr_rate;
-                $processing_fees = $order->processing_fees;
-            } else {
-                $idr_rate = $order_detail->idr_rate;
-                $processing_fees = $order_detail->processing_fees;
-            }
+            
+            $idr_rate = $order_detail->idr_rate;
+            $processing_fees = $order_detail->processing_fees;
             $myrAmount = round($idrAmount / $idr_rate, 2);
             $totalAmount = round($myrAmount + $processing_fees, 2);
             $profit = round($orderTotal - $totalAmount, 2);
