@@ -270,6 +270,52 @@
                             <button type="submit" class="btn btn-primary mt-3" style="float:right">{{ __('sidebar.update_order') }}</button>
                         @endif
                     </form>
+
+                    @if(Auth::user()->role_id == 1 && $order->status == 'completed')
+                        <hr class="my-4">
+                        <div class="stock-profit-summary mt-3">
+                            <p class="card-text text-uppercase mb-2">Stock & Profit Details</p>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40px;" class="text-center">#</th>
+                                            <th>idr amount</th>
+                                            <th>rate</th>
+                                            <th>capital used</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($order->stock_logs as $index => $log)
+                                            <tr>
+                                                <td class="text-center">{{ $index + 1 }}</td>
+                                                <td>{{ number_format($log->idr_amount) }}</td>
+                                                <td>{{ number_format($log->stock_idr_rate) }}</td>
+                                                <td>{{ number_format($log->capital_used, 2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    @if($order->profit)
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="text-end fw-semibold">Total</td>
+                                            <td class="fw-semibold">{{ number_format($order->profit->capital_used, 2) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-end fw-semibold">Do Up (MYR)</td>
+                                            <td class="fw-semibold">{{ number_format($order->profit->amount_received, 2) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-end fw-bold">Profit</td>
+                                            <td class="fw-bold text-success">{{ number_format($order->profit->profit, 2) }}</td>
+                                        </tr>
+                                    </tfoot>
+                                    @endif
+                                </table>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
