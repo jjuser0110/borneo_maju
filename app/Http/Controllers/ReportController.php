@@ -217,4 +217,48 @@ class ReportController extends Controller
         ]);
     }
 
+    public function profit_list(Request $request)
+    {
+        /** ---------------------------
+         *  LOGIN USER
+         * ---------------------------- */
+        if (Auth::user()->role_id !== 1) {
+            return back()->withErrors('Access denied');
+        }
+
+        /** ---------------------------
+         *  DATE RANGE
+         * ---------------------------- */
+        $date_from = $request->date_from
+            ? Carbon::parse($request->date_from)->startOfDay()
+            : Carbon::now()->startOfDay();
+
+        $date_to = $request->date_to
+            ? Carbon::parse($request->date_to)->endOfDay()
+            : Carbon::now()->endOfDay();
+
+        $query = Profit::with(['order.user', 'order.details'])
+            ->whereHas('order', function ($q) use ($date_from, $date_to) {
+                $q->whereBetween('status_at', [$date_from, $date_to])
+                  ->where('status', 'completed');
+            });
+
+        // Calculate grand totals for the entire filtered dataset before pagination
+        $totals = [
+            'capital_used'    => (clone $query)->sum('capital_used'),
+            'amount_received' => (clone $query)->sum('amount_received'),
+            'profit'          => (clone $query)->sum('profit'),
+        ];
+
+        // Paginate by 50 and preserve query string parameters (like date filters) on links
+        $profits = $query->paginate(50)->withQueryString();
+
+        return view('report.profit_list', [
+            'date_from' => $date_from->format('Y-m-d'),
+            'date_to'   => $date_to->format('Y-m-d'),
+            'profits'   => $profits,
+            'totals'    => $totals,
+        ]);
+    }
+
 }

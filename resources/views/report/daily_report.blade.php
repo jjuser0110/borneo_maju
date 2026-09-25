@@ -78,17 +78,19 @@
             </div>
 
             <div class="col-sm-6 col-lg-3 mb-4">
-                <div class="card card-border-shadow-info h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2 pb-1">
-                            <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-success"><i class="fa-solid fa-money-bill"></i></span>
+                <a href="{{ route('report.profit_list', ['date_from' => $date_from, 'date_to' => $date_to]) }}" class="text-decoration-none">
+                    <div class="card card-border-shadow-info h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2 pb-1">
+                                <div class="avatar me-2">
+                                    <span class="avatar-initial rounded bg-label-success"><i class="fa-solid fa-money-bill"></i></span>
+                                </div>
+                                <h4 class="ms-1 mb-0">MYR {{ number_format($profit, 2) }}</h4>
                             </div>
-                            <h4 class="ms-1 mb-0">MYR {{ number_format($profit, 2) }}</h4>
+                            <p class="mb-1">{{ __('sidebar.total_profit') }}</p>
                         </div>
-                        <p class="mb-1">{{ __('sidebar.total_profit') }}</p>
                     </div>
-                </div>
+                </a>
             </div>
 
         </div>
