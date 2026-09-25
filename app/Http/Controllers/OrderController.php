@@ -598,10 +598,10 @@ class OrderController extends Controller
                     if ($order->details()->exists()) {
                         throw new \Exception('Order commission already processed.');
                     }
-                    $this->processCompletedOrder($request, $order);
 
-                    $order->deleted_at = null;
-                    $order->save();
+                    $order->details()->withTrashed()->restore();
+
+                    $this->processCompletedOrder($request, $order);
 
                 });
             } catch (\Exception $e) {
@@ -690,8 +690,6 @@ class OrderController extends Controller
                         'status_by_id'    => null,
                         'remarks'         => $request->remarks,
                     ]);
-
-
                 });
             } catch (\Exception $e) {
                 return back()->withErrors($e->getMessage());
