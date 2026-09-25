@@ -82,6 +82,9 @@ class OrderController extends Controller
     {
         $loginUser = Auth::user();
         $view = true;
+
+        $order->load(['stock_logs', 'profit']);
+
         $bankSettings = BankSetting::where('is_active', 1)
             ->orderBy('position', 'ASC')
             ->get();
