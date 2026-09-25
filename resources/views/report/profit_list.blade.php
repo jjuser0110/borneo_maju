@@ -54,8 +54,8 @@
                         <tfoot>
                             <tr>
                                 <td colspan="3" class="text-end fw-bold">Total</td>
-                                <td class="text-end fw-bold">{{ number_format($totals['capital_used'], 2) }}</td>
                                 <td class="text-end fw-bold">{{ number_format($totals['amount_received'], 2) }}</td>
+                                <td class="text-end fw-bold">{{ number_format($totals['capital_used'], 2) }}</td>
                                 <td class="text-end fw-bold text-success">{{ number_format($totals['profit'], 2) }}</td>
                                 <td></td>
                             </tr>

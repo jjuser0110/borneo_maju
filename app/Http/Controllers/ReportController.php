@@ -160,6 +160,7 @@ class ReportController extends Controller
             ? Carbon::parse($request->date_to)->endOfDay()
             : Carbon::now()->endOfDay();
 
+        /* Client wants to seperate stock in wif transfer in and stock out wif transfer out
         $stock_in = Stock::where('created_at', '>=', $date_from)
             ->where('created_at', '<=', $date_to)
             ->sum('idr_amount');
@@ -170,6 +171,7 @@ class ReportController extends Controller
 
         $stock_out = $orders->sum('idr_amount');
 
+        */
         $profits = Profit::whereHas('order', function ($q) use ($date_from, $date_to) {
             $q->whereBetween('status_at', [$date_from, $date_to]);
         });
@@ -196,6 +198,30 @@ class ReportController extends Controller
                             ELSE 0
                         END
                     ) as total_stock_out
+                "),
+                DB::raw("
+                    SUM(
+                        CASE
+                            WHEN type = 'transfer_in' THEN amount
+                            ELSE 0
+                        END
+                    ) as total_transfer_in
+                "),
+                DB::raw("
+                    SUM(
+                        CASE
+                            WHEN type = 'transfer_out' THEN amount
+                            ELSE 0
+                        END
+                    ) as total_transfer_out
+                "),
+                DB::raw("
+                    SUM(
+                        CASE
+                            WHEN type = 'expenses' THEN amount
+                            ELSE 0
+                        END
+                    ) as total_expenses
                 ")
             )
             ->where('created_at', '>=', $date_from)
@@ -204,11 +230,20 @@ class ReportController extends Controller
             ->get()
             ->keyBy('bank_setting_id');
 
+        $stock_in     = $bankLogs->sum('total_stock_in');
+        $stock_out    = $bankLogs->sum('total_stock_out');
+        $transfer_in  = $bankLogs->sum('total_transfer_in');
+        $transfer_out = $bankLogs->sum('total_transfer_out');
+        $expenses     = $bankLogs->sum('total_expenses');
+
         return view('report.daily_report', [
             'date_from'         => $date_from->format('Y-m-d'),
             'date_to'           => $date_to->format('Y-m-d'),
             'stock_in'          => $stock_in,
             'stock_out'         => $stock_out,
+            'transfer_in'       => $transfer_in,
+            'transfer_out'      => $transfer_out,
+            'expenses'          => $expenses,
             'capital_used'      => $capital_used,
             'amount_received'   => $amount_received,
             'profit'            => $profit,

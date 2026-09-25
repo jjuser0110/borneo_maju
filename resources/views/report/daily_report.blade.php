@@ -54,6 +54,48 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 pb-1">
                             <div class="avatar me-2">
+                                <span class="avatar-initial rounded bg-label-info"><i class="fa-solid fa-money-bill"></i></span>
+                            </div>
+                            <h4 class="ms-1 mb-0">{{ number_format($transfer_in, 2) }}</h4>
+                        </div>
+                        <p class="mb-1">Transfer In</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3 mb-4">
+                <div class="card card-border-shadow-danger h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2 pb-1">
+                            <div class="avatar me-2">
+                                <span class="avatar-initial rounded bg-label-danger"><i class="fa-solid fa-money-bill"></i></span>
+                            </div>
+                            <h4 class="ms-1 mb-0">{{ number_format($transfer_out, 2) }}</h4>
+                        </div>
+                        <p class="mb-1">Transfer Out</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3 mb-4">
+                <div class="card card-border-shadow-warning h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2 pb-1">
+                            <div class="avatar me-2">
+                                <span class="avatar-initial rounded bg-label-warning"><i class="fa-solid fa-money-bill"></i></span>
+                            </div>
+                            <h4 class="ms-1 mb-0">{{ number_format($expenses, 2) }}</h4>
+                        </div>
+                        <p class="mb-1">Expenses</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3 mb-4">
+                <div class="card card-border-shadow-info h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2 pb-1">
+                            <div class="avatar me-2">
                                 <span class="avatar-initial rounded bg-label-danger"><i class="fa-solid fa-money-bill"></i></span>
                             </div>
                             <h4 class="ms-1 mb-0">MYR {{ number_format($capital_used, 2) }}</h4>
