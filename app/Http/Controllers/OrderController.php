@@ -375,6 +375,8 @@ class OrderController extends Controller
 
             $loginUser->update(['point' => $point_after]);
 
+            $order->details()->delete();
+
             $order->delete();
 
             return redirect()->route('order.index')->withSuccess('Order deleted and points refunded.');
@@ -448,6 +450,8 @@ class OrderController extends Controller
                     ]);
 
                     $user->update(['point' => $point_after]);
+
+                    $order->details()->delete();
                 });
             } catch (\Exception $e) {
                 return back()->withErrors($e->getMessage());
@@ -650,6 +654,9 @@ class OrderController extends Controller
                     if ($order->details()->exists()) {
                         throw new \Exception('Order commission already processed.');
                     }
+
+                    $order->details()->withTrashed()->restore();
+
                     $this->processCompletedOrder($request, $order);
 
                 });
@@ -719,7 +726,7 @@ class OrderController extends Controller
                     | 3. Remove COMMISSION (Order Details)
                     |--------------------------------------------------------------------------
                     */
-                    $order->details()->delete();
+                    //$order->details()->delete();
 
                     /*
                     |--------------------------------------------------------------------------
