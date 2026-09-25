@@ -319,6 +319,8 @@ class OrderController extends Controller
 
             $loginUser->update(['point' => $point_after]);
 
+            $order->details()->delete();
+
             $order->delete();
 
             return redirect()->route('order.index')->withSuccess('Order deleted and points refunded.');
@@ -392,6 +394,8 @@ class OrderController extends Controller
                     ]);
 
                     $user->update(['point' => $point_after]);
+
+                    $order->details()->delete();
                 });
             } catch (\Exception $e) {
                 return back()->withErrors($e->getMessage());
@@ -596,6 +600,9 @@ class OrderController extends Controller
                     }
                     $this->processCompletedOrder($request, $order);
 
+                    $order->deleted_at = null;
+                    $order->save();
+
                 });
             } catch (\Exception $e) {
                 return back()->withErrors($e->getMessage());
@@ -663,7 +670,7 @@ class OrderController extends Controller
                     | 3. Remove COMMISSION (Order Details)
                     |--------------------------------------------------------------------------
                     */
-                    $order->details()->delete();
+                    //$order->details()->delete();
 
                     /*
                     |--------------------------------------------------------------------------
@@ -683,6 +690,8 @@ class OrderController extends Controller
                         'status_by_id'    => null,
                         'remarks'         => $request->remarks,
                     ]);
+
+
                 });
             } catch (\Exception $e) {
                 return back()->withErrors($e->getMessage());
