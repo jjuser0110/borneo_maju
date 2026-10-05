@@ -220,43 +220,57 @@ class AgentController extends Controller
 
         $loginUser = Auth::user();
 
-        DB::transaction(function () use ($agent, $request, $loginUser) {
+        // Check if agent has enough points before starting transaction
+        if ($loginUser->role_id == 3 && $loginUser->point < $request->point) {
+            return back()->withErrors('Insufficient points to transfer.');
+        }
 
-            $agent = User::where('id', $agent->id)
-                ->lockForUpdate()
-                ->first();
+        try{
+            DB::transaction(function () use ($agent, $request, $loginUser) {
+                $agent = User::where('id', $agent->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            $point_before = $agent->point;
-            $point_after  = $point_before + $request->point;
+                $point_before = $agent->point;
+                $point_after  = $point_before + $request->point;
 
-            $agent->update([
-                'point' => $point_after,
-            ]);
-
-            PointHistory::create([
-                'agent_id'     => $agent->id,
-                'point_before' => $point_before,
-                'point'        => $request->point,
-                'point_after'  => $point_after,
-                'description'  => 'Top Up From ' . $loginUser->username,
-            ]);
-
-
-            if($loginUser->role_id == 3){
-                $loginuser_point_before = $loginUser->point;
-                $loginuser_point_after = $loginUser->point - $request->point;
-                PointHistory::create([
-                    'agent_id' => $loginUser->id,
-                    'point_before' => $loginuser_point_before,
-                    'point' => -$request->point,
-                    'point_after' => $loginuser_point_after,
-                    'description' => 'Transfer To '.$agent->username
+                $agent->update([
+                    'point' => $point_after,
                 ]);
-                $loginUser->update(['point'=>$loginuser_point_after]);
-            }
-        });
 
-        return back()->with('success', 'Point added successfully');
+                PointHistory::create([
+                    'agent_id'     => $agent->id,
+                    'point_before' => $point_before,
+                    'point'        => $request->point,
+                    'point_after'  => $point_after,
+                    'description'  => 'Top Up From ' . $loginUser->username,
+                ]);
+
+
+                if($loginUser->role_id == 3){
+                    $loginUser = User::where('id', $loginUser->id)->lockForUpdate()->first();
+
+                    if ($loginUser->point < $request->point) {
+                            throw new \Exception('Insufficient points');
+                        }
+                    $loginuser_point_before = $loginUser->point;
+                    $loginuser_point_after = $loginUser->point - $request->point;
+
+                    PointHistory::create([
+                        'agent_id' => $loginUser->id,
+                        'point_before' => $loginuser_point_before,
+                        'point' => -$request->point,
+                        'point_after' => $loginuser_point_after,
+                        'description' => 'Transfer To '.$agent->username
+                    ]);
+                    $loginUser->update(['point'=>$loginuser_point_after]);
+                }
+            });
+
+            return back()->with('success', 'Point added successfully');
+        } catch (\Exception $e) {
+            return back()->withErrors($e->getMessage());
+        }
     }
 
     public function deductPoint(Request $request, User $agent)
@@ -267,45 +281,49 @@ class AgentController extends Controller
 
         $loginUser = Auth::user();
 
-        DB::transaction(function () use ($agent, $request, $loginUser) {
+        try {
+            DB::transaction(function () use ($agent, $request, $loginUser) {
+                $agent = User::where('id', $agent->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            $agent = User::where('id', $agent->id)
-                ->lockForUpdate()
-                ->firstOrFail();
+                $point_before = $agent->point;
+                $point_after  = $point_before - $request->point;
 
-            $point_before = $agent->point;
-            $point_after  = $point_before - $request->point;
+                if ($point_after < 0) {
+                    throw new \Exception('Insufficient points: Cannot deduct more than the current balance.');
+                }
 
-            if ($point_after < 0) {
-                throw new \Exception('Insufficient points');
-            }
-
-            $agent->update([
-                'point' => $point_after,
-            ]);
-
-            PointHistory::create([
-                'agent_id'     => $agent->id,
-                'point_before' => $point_before,
-                'point'        => -$request->point,
-                'point_after'  => $point_after,
-                'description'  => 'Deducted by ' . $loginUser->username,
-            ]);
-
-            if($loginUser->role_id == 3){
-                $loginuser_point_before = $loginUser->point;
-                $loginuser_point_after = $loginUser->point + $request->point;
-                PointHistory::create([
-                    'agent_id' => $loginUser->id,
-                    'point_before' => $loginuser_point_before,
-                    'point' => $request->point,
-                    'point_after' => $loginuser_point_after,
-                    'description' => 'Deducted '.$agent->username
+                $agent->update([
+                    'point' => $point_after,
                 ]);
-                $loginUser->update(['point'=>$loginuser_point_after]);
-            }
-        });
 
-        return back()->with('success', 'Point deducted successfully');
+                PointHistory::create([
+                    'agent_id'     => $agent->id,
+                    'point_before' => $point_before,
+                    'point'        => -$request->point,
+                    'point_after'  => $point_after,
+                    'description'  => 'Deducted by ' . $loginUser->username,
+                ]);
+
+                if($loginUser->role_id == 3){
+                    $loginUser = User::where('id', $loginUser->id)->lockForUpdate()->first();
+
+                    $loginuser_point_before = $loginUser->point;
+                    $loginuser_point_after = $loginUser->point + $request->point;
+                    PointHistory::create([
+                        'agent_id' => $loginUser->id,
+                        'point_before' => $loginuser_point_before,
+                        'point' => $request->point,
+                        'point_after' => $loginuser_point_after,
+                        'description' => 'Deducted '.$agent->username
+                    ]);
+                    $loginUser->update(['point'=>$loginuser_point_after]);
+                }
+            });
+            return back()->with('success', 'Point deducted successfully');
+        } catch (\Exception $e) {
+            return back()->withErrors($e->getMessage());
+        }
     }
 }
