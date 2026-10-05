@@ -144,16 +144,17 @@ class OrderController extends Controller
         $idr_min = $idr_max - $idr_limit;
 
         $request->validate([
-            'myr_amount'      => 'required|numeric|min:0|max:' . Auth::user()->limit ?? 5000,
+            'myr_amount'      => 'required|numeric|min:0|max:' . (Auth::user()->limit ?? 5000),
             'idr_rate'        => 'required|numeric|min:' . $idr_min . '|max:' . $idr_max,
             'processing_fees' => 'required|numeric|min:0',
         ]);
 
-        if ($loginUser->point < $request->myr_amount) {
-            return redirect()->back()->withError('Insufficient point balance.');
-        }
+        return DB::transaction(function () use ($request) {
+            $loginUser = User::lockForUpdate()->find(Auth::id());
 
-        return DB::transaction(function () use ($request, $loginUser) {
+            if ($loginUser->point < $request->myr_amount) {
+                return redirect()->back()->withError('Insufficient point balance.');
+            }
 
             if (Order::where('order_no', $request->order_no)->exists()) {
                 return redirect()->route('order.index')->withError('This order has already been submitted.');
@@ -263,36 +264,47 @@ class OrderController extends Controller
         $idr_min = $idr_max - $idr_limit;
 
         $request->validate([
-            'myr_amount'      => 'required|numeric|min:0|max:' . Auth::user()->limit ?? 5000,
+            'myr_amount'      => 'required|numeric|min:0|max:' . (Auth::user()->limit ?? 5000),
             'idr_rate'        => 'required|numeric|min:' . $idr_min . '|max:' . $idr_max,
             'processing_fees' => 'required|numeric|min:0',
         ]);
 
-        return DB::transaction(function () use ($request, $order, $loginUser) {
+        try{
+            return DB::transaction(function () use ($request, $order) {
+                $loginUser = User::lockForUpdate()->find(Auth::id());
 
-            $point_before = $loginUser->point;
-            $total_amount = round($request->myr_amount + $request->processing_fees, 2);
+                $point_before = $loginUser->point;
+                $total_amount = round($request->myr_amount + $request->processing_fees, 2);
 
-            $old_myr_amount = $order->myr_amount;
-            $new_myr_amount = $request->myr_amount;
-            $adjustment = round($old_myr_amount - $new_myr_amount, 2);
-            $point_after = round($point_before + $adjustment, 2);
+                $old_myr_amount = $order->myr_amount;
+                $new_myr_amount = $request->myr_amount;
+                $adjustment = round($old_myr_amount - $new_myr_amount, 2);
 
-            $request->merge(['total_amount' => $total_amount]);
-            $order->update($request->all());
+                // Validate sufficient points if amount is being increased ($adjustment is negative)
+                if ($adjustment < 0 && $point_before < abs($adjustment)) {
+                    throw new \Exception('Insufficient point balance for the increased amount.');
+                }
 
-            PointHistory::create([
-                'agent_id' => $loginUser->id,
-                'point_before' => $point_before,
-                'point' => $adjustment,
-                'point_after' => $point_after,
-                'description' => 'Update Order '.$order->order_no
-            ]);
+                $point_after = round($point_before + $adjustment, 2);
 
-            $loginUser->update(['point' => $point_after]);
+                $request->merge(['total_amount' => $total_amount]);
+                $order->update($request->all());
 
-            return redirect()->route('order.index')->withSuccess('Data updated');
-        });
+                PointHistory::create([
+                    'agent_id' => $loginUser->id,
+                    'point_before' => $point_before,
+                    'point' => $adjustment,
+                    'point_after' => $point_after,
+                    'description' => 'Update Order '.$order->order_no
+                ]);
+
+                $loginUser->update(['point' => $point_after]);
+
+                return redirect()->route('order.index')->withSuccess('Data updated');
+            });
+        }catch (\Exception $e) {
+            return back()->withErrors($e->getMessage());
+        }
     }
 
     public function destroy(Order $order)
@@ -579,9 +591,15 @@ class OrderController extends Controller
             try {
                 DB::transaction(function () use ($request, $order) {
                     // Deduct refunded points
-                    $user = $order->user;
+                    $user = User::lockForUpdate()->find($order->user_id);
                     $point_before = $user->point;
                     $revert_amount = $order->myr_amount;
+
+                    // Ensure user has enough points before re-deducting
+                    if ($point_before < $revert_amount) {
+                        throw new \Exception('User has insufficient points balance to revert this cancelled order (points may have already been spent).');
+                    }
+
                     $point_after = round($point_before - $revert_amount, 2);
 
                     PointHistory::create([
