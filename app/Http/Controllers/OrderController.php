@@ -65,7 +65,7 @@ class OrderController extends Controller
             ->map(function ($group) {
                 return [
                     'bank_id' => $group->first()->bank_id,
-                    'bank_name' => $group->first()->bank->name,
+                    'bank_name' => $group->first()->bank->bank_name,
                     'total_idr_amount' => $group->sum('idr_amount')
                 ];
             });
