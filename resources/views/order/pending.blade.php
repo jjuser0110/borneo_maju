@@ -15,6 +15,14 @@
                 </div>
                 <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 </div>
+                <div class="order-by-bank-summary mt-3">
+                    <h6>{{ __('sidebar.order_by_bank') }}</h6>
+                    <ul>
+                        @foreach($orderByBank as $bank)
+                            <li>{{ $bank['bank_name'] }}: {{ number_format($bank['total_idr_amount']) }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
 
             <div class="card-datatable text-nowrap">

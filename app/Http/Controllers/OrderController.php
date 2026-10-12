@@ -61,7 +61,15 @@ class OrderController extends Controller
         $order = Order::whereIn('status', ["pending", "processing"])->get();
         $pending = true;
 
-        return view('order.pending')->with('order',$order)->with('pending', $pending);
+        $orderByBank = $order->groupBy('bank_id')
+            ->map(function ($group) {
+                return [
+                    'bank_id' => $group->first()->bank_id,
+                    'bank_name' => $group->first()->bank->name,
+                    'total_idr_amount' => $group->sum('idr_amount')
+                ];
+            });
+        return view('order.pending')->with('order',$order)->with('pending', $pending)->with('orderByBank', $orderByBank);
     }
 
     public function view(Request $request, Order $order)
