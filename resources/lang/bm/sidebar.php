@@ -200,4 +200,6 @@ return [
     'current_rate' => 'Kadar Semasa (IDR)',
     'new_rate' => 'Kadar Baharu (IDR)',
     'invalid_rate' => 'Kadar Tidak Sah',
+    'order_by_bank' => 'Pesanan Mengikut Bank',
+    'total' => 'Jumlah',
 ];

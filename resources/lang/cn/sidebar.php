@@ -200,4 +200,6 @@ return [
     'current_rate' => '当前汇率 (IDR)',
     'new_rate' => '新汇率 (IDR)',
     'invalid_rate' => '无效的汇率',
+    'order_by_bank' => '按银行分订单',
+    'total' => '总计',
 ];

@@ -200,4 +200,6 @@ return [
     'current_rate' => 'Current Rate (IDR)',
     'new_rate' => 'New Rate (IDR)',
     'invalid_rate' => 'Invalid Rate',
+    'order_by_bank' => 'Order by Bank',
+    'total' => 'Total',
 ];
