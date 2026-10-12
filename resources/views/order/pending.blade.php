@@ -165,44 +165,46 @@
             </div>
             
             
-            <div class="bank-summary-section">
-                <div class="bank-summary-header">
-                    <h5 class="mb-0">
-                        <i class="bx bx-buildings me-2"></i>
-                        {{ __('sidebar.order_by_bank') }}
-                    </h5>
-                    <span class="badge bg-label-primary">
-                        {{ $orderByBank->count() }} Banks
-                    </span>
-                </div>
+            <div class="card-header flex-column flex-md-row">
+                <div class="bank-summary-section">
+                    <div class="bank-summary-header">
+                        <h5 class="mb-0">
+                            <i class="bx bx-buildings me-2"></i>
+                            {{ __('sidebar.order_by_bank') }}
+                        </h5>
+                        <span class="badge bg-label-primary">
+                            {{ $orderByBank->count() }} Banks
+                        </span>
+                    </div>
 
-                <div class="row g-3">
-                    @foreach($orderByBank as $bank)
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <div class="bank-summary-card">
-                                <div class="bank-name">
-                                    {{ $bank['bank_name'] }}
+                    <div class="row g-3">
+                        @foreach($orderByBank as $bank)
+                            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                                <div class="bank-summary-card">
+                                    <div class="bank-name">
+                                        {{ $bank['bank_name'] }}
+                                    </div>
+                                    <div class="bank-amount">
+                                        {{ number_format($bank['total_idr_amount']) }}
+                                    </div>
+                                    <div class="bank-currency">IDR</div>
                                 </div>
-                                <div class="bank-amount">
-                                    {{ number_format($bank['total_idr_amount']) }}
-                                </div>
-                                <div class="bank-currency">IDR</div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="bank-grand-total">
+                        <div>
+                            <div class="total-label">
+                                {{ __('sidebar.total') }}
+                            </div>
+                            <div class="total-description">
+                                Total amount across all banks
                             </div>
                         </div>
-                    @endforeach
-                </div>
-
-                <div class="bank-grand-total">
-                    <div>
-                        <div class="total-label">
-                            {{ __('sidebar.total') }}
+                        <div class="total-amount">
+                            IDR {{ number_format($orderByBank->sum('total_idr_amount')) }}
                         </div>
-                        <div class="total-description">
-                            Total amount across all banks
-                        </div>
-                    </div>
-                    <div class="total-amount">
-                        IDR {{ number_format($orderByBank->sum('total_idr_amount')) }}
                     </div>
                 </div>
             </div>
