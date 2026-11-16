@@ -58,18 +58,47 @@ class OrderController extends Controller
     public function pending(Request $request)
     {
         $loginUser = Auth::user();
-        $order = Order::whereIn('status', ["pending", "processing"])->get();
         $pending = true;
+
+        // Order no starts with the agent username, so filter by its prefix.
+        // The chosen filter is remembered in session so it survives handling an order.
+        $prefixes = Order::PENDING_PREFIXES;
+        if ($request->has('prefix')) {
+            $prefix = in_array($request->prefix, $prefixes, true) ? $request->prefix : null;
+            session(['pending_prefix' => $prefix]);
+        } else {
+            $prefix = session('pending_prefix');
+            $prefix = in_array($prefix, $prefixes, true) ? $prefix : null;
+        }
+
+        $allPending = Order::with(['user', 'bank'])
+            ->whereIn('status', ["pending", "processing"])
+            ->get();
+
+        $prefixCounts = ['all' => $allPending->count()];
+        foreach ($prefixes as $p) {
+            $prefixCounts[$p] = $allPending->filter(fn ($o) => str_starts_with((string) $o->order_no, $p))->count();
+        }
+
+        $order = $prefix
+            ? $allPending->filter(fn ($o) => str_starts_with((string) $o->order_no, $prefix))->values()
+            : $allPending;
 
         $orderByBank = $order->groupBy('bank_id')
             ->map(function ($group) {
                 return [
                     'bank_id' => $group->first()->bank_id,
-                    'bank_name' => $group->first()->bank->bank_name,
+                    'bank_name' => $group->first()->bank?->bank_name ?? '-',
                     'total_idr_amount' => $group->sum('idr_amount')
                 ];
             });
-        return view('order.pending')->with('order',$order)->with('pending', $pending)->with('orderByBank', $orderByBank);
+        return view('order.pending')
+            ->with('order', $order)
+            ->with('pending', $pending)
+            ->with('orderByBank', $orderByBank)
+            ->with('prefixes', $prefixes)
+            ->with('prefix', $prefix)
+            ->with('prefixCounts', $prefixCounts);
     }
 
     public function view(Request $request, Order $order)

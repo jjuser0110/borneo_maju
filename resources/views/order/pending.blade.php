@@ -1,8 +1,17 @@
 @extends('layouts.app')
 @section('content')
 <style>
-    
-<style>
+.prefix-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 24px 16px;
+}
+
+.prefix-filter .btn .badge {
+    margin-left: 4px;
+}
+
 .bank-summary-section {
     padding: 24px;
     border-top: 1px solid #e7e7e8;
@@ -121,6 +130,21 @@
                 </div>
                 <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 </div>
+            </div>
+
+            <div class="prefix-filter">
+                <a href="{{ route('order.pending', ['prefix' => 'all']) }}"
+                   class="btn btn-sm {{ $prefix ? 'btn-outline-primary' : 'btn-primary' }}"
+                   onclick="showLoading()">
+                    All <span class="badge bg-white text-primary">{{ $prefixCounts['all'] }}</span>
+                </a>
+                @foreach($prefixes as $p)
+                    <a href="{{ route('order.pending', ['prefix' => $p]) }}"
+                       class="btn btn-sm {{ $prefix === $p ? 'btn-primary' : 'btn-outline-primary' }}"
+                       onclick="showLoading()">
+                        {{ $p }} <span class="badge bg-white text-primary">{{ $prefixCounts[$p] }}</span>
+                    </a>
+                @endforeach
             </div>
 
             <div class="card-datatable text-nowrap">

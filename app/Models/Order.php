@@ -11,6 +11,9 @@ class Order extends Model
     use HasFactory;
     use SoftDeletes;
 
+    // Order no prefixes (agent username groups) available as filters on the pending order page.
+    public const PENDING_PREFIXES = ['WW', 'WM', 'S88'];
+
     protected $fillable = [
         'user_id',
         'order_no',
