@@ -29,6 +29,10 @@ class ReportController extends Controller
          * ---------------------------- */
         if ($request->user_id > 0) {
             $login_user = User::findOrFail($request->user_id);
+            // Admin can view anyone; agents only people in their own downline.
+            if ((int) $login_user->id !== (int) Auth::id()) {
+                abort_unless(Auth::user()->canView($login_user), 403);
+            }
         } else {
             $login_user = Auth::user();
         }

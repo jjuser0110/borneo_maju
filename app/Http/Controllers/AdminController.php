@@ -34,32 +34,54 @@ class AdminController extends Controller
             return redirect()->back()
                         ->withErrors($validator);
         }
-        $request->merge(['password' => Hash::make($request->password),'role_id'=>1]);
+        $request->validate(['password' => 'required|string|min:8', 'name' => 'required|string|max:255']);
 
-        $admin = User::create($request->all());
+        $admin = User::create([
+            'name'      => $request->name,
+            'username'  => $request->username,
+            'password'  => Hash::make($request->password),
+            'is_active' => $request->is_active == '0' ? 0 : 1,
+            'role_id'   => 1,
+        ]);
 
         return redirect()->route('admin.index')->withSuccess('Data saved');
     }
 
     public function edit(User $admin)
     {
+        abort_unless((int) $admin->role_id === 1, 404);
+
         return view('admin.create')->with('admin',$admin);
     }
 
     public function update(Request $request, User $admin)
     {
-        if($request->password !=null){
-            $request->merge(['password' => Hash::make($request->password)]);
-        }else{
-            $request->request->remove('password');
+        abort_unless((int) $admin->role_id === 1, 404);
+
+        $request->validate([
+            'username' => 'required|unique:users,username,' . $admin->id . ',id,deleted_at,NULL',
+            'password' => 'nullable|string|min:8',
+            'name'     => 'sometimes|required|string|max:255',
+            'is_active' => 'nullable|in:0,1',
+        ]);
+
+        // Only these fields may be changed from the form — never role_id, point, upline, etc.
+        $data = $request->only(['name', 'username', 'is_active']);
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
         }
-        // dd($request->all());
-        $admin->update($request->all());
+
+        $admin->update($data);
         return redirect()->route('admin.index')->withSuccess('Data updated');
     }
 
     public function destroy(User $admin)
     {
+        abort_unless((int) $admin->role_id === 1, 404);
+        if ((int) $admin->id === (int) Auth::id()) {
+            return redirect()->route('admin.index')->withErrors('You cannot delete your own account.');
+        }
+
         $admin->delete();
 
         return redirect()->route('admin.index')->withSuccess('Data deleted');

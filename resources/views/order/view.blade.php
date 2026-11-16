@@ -254,7 +254,7 @@
                                 @if(isset($order) && isset($order->last_image))
                                     <a href="{{ asset('storage/'.$order->last_image->file_path) }}" target="_blank">{{ $order->last_image->file_name ?? '' }}</a>
                                     @if(!isset($view) || !$view)
-                                        <a style="color:red" onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){window.location.href='{{ route('removeimage',$order->last_image->id) }}'}"><i class="bx bx-trash"></i></a>
+                                        <a style="color:red" onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){postTo('{{ route('removeimage',$order->last_image->id) }}')}"><i class="bx bx-trash"></i></a>
                                     @endif
                                 @else
                                     @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)

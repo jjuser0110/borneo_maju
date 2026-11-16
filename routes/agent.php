@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('/agent')->as('agent.')->middleware(['auth'])->group(function() {
+// Admin + agent. Agents are further limited to their own downline inside the controller.
+Route::prefix('/agent')->as('agent.')->middleware(['auth', 'role:1,3'])->group(function() {
     Route::get('/index', 'AgentController@index')->name('index');
     Route::get('/create', 'AgentController@create')->name('create');
     Route::post('/store', 'AgentController@store')->name('store');
@@ -11,8 +12,11 @@ Route::prefix('/agent')->as('agent.')->middleware(['auth'])->group(function() {
     Route::get('/downline/{agent}', 'AgentController@downline')->name('downline');
     Route::get('/viewlog/{agent}', 'AgentController@viewlog')->name('viewlog');
     Route::post('/update/{agent}', 'AgentController@update')->name('update');
-    Route::get('/destroy/{agent}', 'AgentController@destroy')->name('destroy');
 
     Route::post('/add-point/{agent}', 'AgentController@addPoint')->name('addPoint');
     Route::post('/deduct-point/{agent}', 'AgentController@deductPoint')->name('deductPoint');
+});
+
+Route::prefix('/agent')->as('agent.')->middleware(['auth', 'role:1'])->group(function() {
+    Route::post('/destroy/{agent}', 'AgentController@destroy')->name('destroy');
 });

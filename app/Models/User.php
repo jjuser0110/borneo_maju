@@ -89,4 +89,63 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'upline');
     }
+
+    public function isAdmin(): bool
+    {
+        return (int) $this->role_id === 1;
+    }
+
+    public function isAgent(): bool
+    {
+        return (int) $this->role_id === 3;
+    }
+
+    /**
+     * True when $this sits anywhere below $user in the upline chain.
+     */
+    public function isDownlineOf(User $user): bool
+    {
+        $current = $this->uplineUser;
+        $seen = [];
+
+        while ($current && !isset($seen[$current->id])) {
+            if ((int) $current->id === (int) $user->id) {
+                return true;
+            }
+            $seen[$current->id] = true; // guard against loops in bad data
+            $current = $current->uplineUser;
+        }
+
+        return false;
+    }
+
+    /**
+     * Can $this (the logged-in user) see the given agent's pages?
+     * Admins see everyone; agents only see their own downline tree.
+     */
+    public function canView(User $agent): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->isAgent() && $agent->isDownlineOf($this);
+    }
+
+    /**
+     * Can $this change the given agent (edit, move points)?
+     * Admins: any agent. Agents: only their direct downline.
+     */
+    public function canManage(User $agent): bool
+    {
+        if (!$agent->isAgent()) {
+            return false;
+        }
+
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->isAgent() && (int) $agent->upline === (int) $this->id;
+    }
 }

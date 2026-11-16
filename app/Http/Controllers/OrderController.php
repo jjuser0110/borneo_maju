@@ -118,6 +118,7 @@ class OrderController extends Controller
     public function view_details(Request $request, Order $order)
     {
         $loginUser = Auth::user();
+        abort_if($loginUser->role_id == 3 && (int) $order->user_id !== (int) $loginUser->id, 403);
         $view = true;
 
         $order->load(['stock_logs', 'profit']);
@@ -181,10 +182,24 @@ class OrderController extends Controller
         $idr_min = $idr_max - $idr_limit;
 
         $request->validate([
+            'order_no'        => 'required|string|max:100',
             'myr_amount'      => 'required|numeric|min:0|max:' . (Auth::user()->limit ?? 5000),
             'idr_rate'        => 'required|numeric|min:' . $idr_min . '|max:' . $idr_max,
-            'processing_fees' => 'required|numeric|min:0',
+            'idr_amount'      => 'required|numeric|min:0',
+            'processing_fees' => 'required|numeric|min:' . (Auth::user()->processing_fees ?? 0),
+            'bank_id'         => 'nullable|exists:banks,id',
+            'order_datetime'  => 'nullable|date',
         ]);
+
+        // Order numbers always start with the creator's own username.
+        if (!str_starts_with((string) $request->order_no, (string) $loginUser->username)) {
+            return redirect()->back()->withErrors('Invalid order number.')->withInput();
+        }
+
+        // IDR amount must match MYR x rate (allow 1 sen of rounding).
+        if (!$this->idrAmountMatches($request)) {
+            return redirect()->back()->withErrors('IDR amount does not match MYR amount x IDR rate.')->withInput();
+        }
 
         return DB::transaction(function () use ($request) {
             $loginUser = User::lockForUpdate()->find(Auth::id());
@@ -199,14 +214,17 @@ class OrderController extends Controller
 
             $total_amount = round($request->myr_amount + $request->processing_fees, 2);
 
-            $request->merge([
-                'user_id' => $loginUser->id,
-                'total_amount' => $total_amount
-            ]);
+            // Only form fields the agent is allowed to set; status, owner and totals are decided here.
+            $order = Order::create(array_merge($this->orderFormFields($request), [
+                'order_no'     => $request->order_no,
+                'user_id'      => $loginUser->id,
+                'total_amount' => $total_amount,
+                'my_idr_rate'  => $loginUser->idr_rate,
+                'status'       => 'pending',
+            ]));
 
-            $order = Order::create($request->all());
-
-            $check = RunningNumber::where('code', $request->code)
+            $check = RunningNumber::where('name', 'order')
+                ->where('code', $loginUser->username)
                 ->where('year', $request->year)
                 ->where('month', $request->month)
                 ->first();
@@ -278,6 +296,8 @@ class OrderController extends Controller
 
     public function edit(Order $order)
     {
+        abort_if((int) $order->user_id !== (int) Auth::id(), 403);
+
         $bank = Bank::all();
         return view('order.create', [
             'order' => $order,
@@ -303,8 +323,15 @@ class OrderController extends Controller
         $request->validate([
             'myr_amount'      => 'required|numeric|min:0|max:' . ($loginUser->limit ?? 5000),
             'idr_rate'        => 'required|numeric|min:' . $idr_min . '|max:' . $idr_max,
-            'processing_fees' => 'required|numeric|min:0',
+            'idr_amount'      => 'required|numeric|min:0',
+            'processing_fees' => 'required|numeric|min:' . ($loginUser->processing_fees ?? 0),
+            'bank_id'         => 'nullable|exists:banks,id',
+            'order_datetime'  => 'nullable|date',
         ]);
+
+        if (!$this->idrAmountMatches($request)) {
+            return redirect()->back()->withErrors('IDR amount does not match MYR amount x IDR rate.')->withInput();
+        }
 
         try{
             return DB::transaction(function () use ($request, $order) {
@@ -324,8 +351,13 @@ class OrderController extends Controller
 
                 $point_after = round($point_before + $adjustment, 2);
 
-                $request->merge(['total_amount' => $total_amount]);
-                $order->update($request->all());
+                $order = Order::lockForUpdate()->find($order->id);
+                if ($order->status != 'pending') {
+                    throw new \Exception('Only pending order can be updated');
+                }
+                $order->update(array_merge($this->orderFormFields($request), [
+                    'total_amount' => $total_amount,
+                ]));
 
                 PointHistory::create([
                     'agent_id' => $loginUser->id,
@@ -412,6 +444,12 @@ class OrderController extends Controller
         }
 
         return DB::transaction(function () use ($order, $loginUser) {
+            // Re-check under lock so two clicks can't refund twice.
+            $order = Order::lockForUpdate()->find($order->id);
+            if (!$order || $order->status != 'pending') {
+                return redirect()->route('order.index')->withError('Only pending order can be deleted');
+            }
+            $loginUser = User::lockForUpdate()->find($loginUser->id);
 
             $point_before = $loginUser->point;
             $refund_amount = $order->myr_amount;
@@ -437,7 +475,14 @@ class OrderController extends Controller
 
     public function pending_update(Request $request, Order $order)
     {
-        // dd($request->all());
+        $request->validate([
+            'status'                => 'nullable|in:pending,processing,completed,cancelled',
+            'bank_setting_id'       => 'nullable|exists:bank_settings,id',
+            'idr_cost_for_transfer' => 'nullable|numeric|min:0',
+            'remarks'               => 'nullable|string|max:1000',
+            'receipt'               => 'nullable|file|max:10240|mimes:' . implode(',', self::ALLOWED_UPLOAD_EXTENSIONS),
+        ]);
+
         if ($request->has('status')) {
             if ($order->status === 'completed') {
                 return redirect()->route('order.edit', $order)->withErrors('Order is completed.');
@@ -468,6 +513,12 @@ class OrderController extends Controller
 
             try {
                 DB::transaction(function () use ($request, $order) {
+                    // Re-check under lock so the same order can't be refunded twice.
+                    $order = Order::lockForUpdate()->find($order->id);
+                    if (in_array($order->status, ['completed', 'cancelled'], true)) {
+                        throw new \Exception('Order is already ' . $order->status . '.');
+                    }
+
                     // Update order
                     $order->update([
                         'status'          => $request->status,
@@ -488,7 +539,7 @@ class OrderController extends Controller
                         ]);
                     }
 
-                    $user = $order->user;
+                    $user = User::lockForUpdate()->find($order->user_id);
                     $point_before = $user->point;
                     $refund_amount = $order->myr_amount;
                     $point_after = round($point_before + $refund_amount, 2);
@@ -511,14 +562,13 @@ class OrderController extends Controller
         } else {
 
             // Update order
+            $data = $request->only(['status', 'remarks', 'bank_setting_id', 'idr_cost_for_transfer']);
             if ($request->status) {
-                $request->merge([
-                    'status_at'       => now(),
-                    'status_by_id'    => Auth::id(),
-                ]);
+                $data['status_at']    = now();
+                $data['status_by_id'] = Auth::id();
             }
 
-            $order->update($request->all());
+            $order->update($data);
 
             // Receipt upload
             if ($request->hasFile('receipt')) {
@@ -537,6 +587,11 @@ class OrderController extends Controller
 
     private function processCompletedOrder($request, $order)
     {
+        $order = Order::lockForUpdate()->find($order->id);
+        if (in_array($order->status, ['completed', 'cancelled'], true)) {
+            throw new \Exception('Order is already ' . $order->status . '.');
+        }
+
         $bank_setting = BankSetting::lockForUpdate()->findOrFail($request->bank_setting_id);
 
         if ($bank_setting->amount < $order->idr_amount) {
@@ -811,5 +866,23 @@ class OrderController extends Controller
 
             return redirect()->route('order.view_details', $order)->withSuccess('Data updated');
         }
+    }
+
+    /** Fields an order creator may set from the form. */
+    private function orderFormFields(Request $request): array
+    {
+        return $request->only([
+            'order_datetime', 'bank_id', 'account_no', 'fullname',
+            'idr_rate', 'myr_amount', 'idr_amount', 'processing_fees', 'order_remarks',
+        ]);
+    }
+
+    /** IDR amount must equal MYR x rate, give or take 1 sen of MYR rounding. */
+    private function idrAmountMatches(Request $request): bool
+    {
+        $expected = (float) $request->myr_amount * (float) $request->idr_rate;
+        $tolerance = (float) $request->idr_rate * 0.01 + 1;
+
+        return abs((float) $request->idr_amount - $expected) <= $tolerance;
     }
 }

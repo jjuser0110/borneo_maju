@@ -34,32 +34,54 @@ class StaffController extends Controller
             return redirect()->back()
                         ->withErrors($validator);
         }
-        $request->merge(['password' => Hash::make($request->password),'role_id'=>2]);
+        $request->validate(['password' => 'required|string|min:8', 'name' => 'required|string|max:255']);
 
-        $staff = User::create($request->all());
+        $staff = User::create([
+            'name'      => $request->name,
+            'username'  => $request->username,
+            'password'  => Hash::make($request->password),
+            'is_active' => $request->is_active == '0' ? 0 : 1,
+            'role_id'   => 2,
+        ]);
 
         return redirect()->route('staff.index')->withSuccess('Data saved');
     }
 
     public function edit(User $staff)
     {
+        abort_unless((int) $staff->role_id === 2, 404);
+
         return view('staff.create')->with('staff',$staff);
     }
 
     public function update(Request $request, User $staff)
     {
-        if($request->password !=null){
-            $request->merge(['password' => Hash::make($request->password)]);
-        }else{
-            $request->request->remove('password');
+        abort_unless((int) $staff->role_id === 2, 404);
+
+        $request->validate([
+            'username' => 'required|unique:users,username,' . $staff->id . ',id,deleted_at,NULL',
+            'password' => 'nullable|string|min:8',
+            'name'     => 'sometimes|required|string|max:255',
+            'is_active' => 'nullable|in:0,1',
+        ]);
+
+        // Only these fields may be changed from the form — never role_id, point, upline, etc.
+        $data = $request->only(['name', 'username', 'is_active']);
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
         }
-        // dd($request->all());
-        $staff->update($request->all());
+
+        $staff->update($data);
         return redirect()->route('staff.index')->withSuccess('Data updated');
     }
 
     public function destroy(User $staff)
     {
+        abort_unless((int) $staff->role_id === 2, 404);
+        if ((int) $staff->id === (int) Auth::id()) {
+            return redirect()->route('staff.index')->withErrors('You cannot delete your own account.');
+        }
+
         $staff->delete();
 
         return redirect()->route('staff.index')->withSuccess('Data deleted');

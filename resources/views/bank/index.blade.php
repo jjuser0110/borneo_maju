@@ -49,7 +49,7 @@
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
                                 <a style="color:red;cursor:pointer"
-                                   onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){showLoading();window.location.href='{{ route('bank.destroy',$row) }}'}">
+                                   onclick="if(confirm('{{ __('sidebar.confirm_delete') }}')){showLoading();postTo('{{ route('bank.destroy',$row) }}')}">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
                                 <div class="btn-group">

@@ -21,7 +21,7 @@ class AgentController extends Controller
         if($loginUser->role_id == 3){
             $agent = User::where('role_id',3)->where('upline',$loginUser->id)->get();
         }else{
-            $adminstaff_ids = User::where('role_id',[1,2])->pluck('id')->toArray();
+            $adminstaff_ids = User::whereIn('role_id',[1,2])->pluck('id')->toArray();
             $agent = User::where('role_id',3)->whereIn('upline',$adminstaff_ids)->get();
         }
 
@@ -38,8 +38,15 @@ class AgentController extends Controller
         $loginUser = Auth::user();
 
         $rules = [
-            'limit' => ['required', 'numeric'],
-            'idr_limit' => ['required', 'numeric'],
+            'username'        => ['required', 'string', 'max:255'],
+            'password'        => ['required', 'string', 'min:8'],
+            'name'            => ['required', 'string', 'max:255'],
+            'is_active'       => ['nullable', 'in:0,1'],
+            'idr_rate'        => ['required', 'numeric', 'min:0'],
+            'processing_fees' => ['required', 'numeric', 'min:0'],
+            'point'           => ['nullable', 'numeric', 'min:0'],
+            'limit'           => ['required', 'numeric', 'min:0'],
+            'idr_limit'       => ['required', 'numeric', 'min:0'],
         ];
 
         if ($loginUser->role_id !== 1 && !is_null($loginUser->limit)) { // not admin
@@ -52,77 +59,117 @@ class AgentController extends Controller
 
         $request->validate($rules);
 
+        $username = $request->username;
         if($loginUser->role_id == 3){
-            $request->merge(['username'=> $loginUser->username.$request->username]);
+            $username = $loginUser->username.$request->username;
         }
 
-        $checkusername = User::where('username',$request->username)->first();
+        $checkusername = User::withTrashed()->where('username',$username)->first();
         if($checkusername){
             return redirect()->back()->withErrors('Username already taken')->withInput();
         }
 
-        $request->merge(['password' => Hash::make($request->password),'role_id'=>3,'upline'=>Auth::user()->id]);
+        $point = round((float) ($request->point ?? 0), 2);
 
-        $agent = User::create($request->all());
+        try {
+            DB::transaction(function () use ($request, $loginUser, $username, $point) {
+                // Agents pay for the starting points out of their own balance.
+                if ($loginUser->role_id == 3) {
+                    $loginUser = User::where('id', $loginUser->id)->lockForUpdate()->first();
+                    if ($loginUser->point < $point) {
+                        throw new \Exception('Insufficient points to transfer.');
+                    }
+                }
 
-        PointHistory::create([
-            'agent_id' => $agent->id,
-            'point_before' => 0,
-            'point' => $request->point,
-            'point_after' => $request->point,
-            'description' => 'Top Up From '.$loginUser->username
-        ]);
+                // Only these fields come from the form; role and upline are fixed here.
+                $agent = User::create([
+                    'name'            => $request->name,
+                    'username'        => $username,
+                    'password'        => Hash::make($request->password),
+                    'is_active'       => $request->is_active == '0' ? 0 : 1,
+                    'idr_rate'        => $request->idr_rate,
+                    'processing_fees' => $request->processing_fees,
+                    'limit'           => $request->limit,
+                    'idr_limit'       => $request->idr_limit,
+                    'point'           => $point,
+                    'role_id'         => 3,
+                    'upline'          => $loginUser->id,
+                ]);
 
-        if($loginUser->role_id == 3){
-            $point_before = $loginUser->point;
-            $point_after = $loginUser->point - $request->point;
-            PointHistory::create([
-                'agent_id' => $loginUser->id,
-                'point_before' => $point_before,
-                'point' => $request->point,
-                'point_after' => $point_after,
-                'description' => 'Transfer To '.$agent->username
-            ]);
-            $loginUser->update(['point'=>$point_after]);
+                PointHistory::create([
+                    'agent_id' => $agent->id,
+                    'point_before' => 0,
+                    'point' => $point,
+                    'point_after' => $point,
+                    'description' => 'Top Up From '.$loginUser->username
+                ]);
+
+                if($loginUser->role_id == 3){
+                    $point_before = $loginUser->point;
+                    $point_after = round($loginUser->point - $point, 2);
+                    PointHistory::create([
+                        'agent_id' => $loginUser->id,
+                        'point_before' => $point_before,
+                        'point' => $point,
+                        'point_after' => $point_after,
+                        'description' => 'Transfer To '.$agent->username
+                    ]);
+                    $loginUser->update(['point'=>$point_after]);
+                }
+
+                $agent->save_history()->create([
+                    'field_name' => 'idr_rate',
+                    'old_value' => null,
+                    'new_value' => $request->idr_rate,
+                ]);
+
+                $agent->save_history()->create([
+                    'field_name' => 'processing_fees',
+                    'old_value' => null,
+                    'new_value' => $request->processing_fees,
+                ]);
+            });
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors($e->getMessage())->withInput();
         }
-
-        $agent->save_history()->create([
-            'field_name' => 'idr_rate',
-            'old_value' => null,
-            'new_value' => $request->idr_rate,
-        ]);
-
-        $agent->save_history()->create([
-            'field_name' => 'processing_fees',
-            'old_value' => null,
-            'new_value' => $request->processing_fees,
-        ]);
 
         return redirect()->route('agent.index')->withSuccess('Data saved');
     }
 
     public function edit(User $agent)
     {
+        abort_unless(Auth::user()->canManage($agent), 403);
+
         return view('agent.create')->with('agent',$agent);
     }
 
     public function downline(User $agent)
     {
+        abort_unless(Auth::user()->canView($agent), 403);
+
         return view('agent.downline')->with('agent',$agent);
     }
 
     public function viewlog(User $agent)
     {
+        abort_unless(Auth::user()->canView($agent), 403);
+
         return view('agent.viewlog')->with('agent',$agent);
     }
 
     public function update(Request $request, User $agent)
     {
         $user = Auth::user();
+        abort_unless($user->canManage($agent), 403);
 
         $rules = [
-            'limit' => ['required', 'numeric'],
-            'idr_limit' => ['required', 'numeric'],
+            'password'        => ['nullable', 'string', 'min:8'],
+            'name'            => ['sometimes', 'required', 'string', 'max:255'],
+            'is_active'       => ['nullable', 'in:0,1'],
+            'idr_rate'        => ['required', 'numeric', 'min:0'],
+            'processing_fees' => ['required', 'numeric', 'min:0'],
+            'limit'           => ['required', 'numeric', 'min:0'],
+            'idr_limit'       => ['required', 'numeric', 'min:0'],
         ];
 
         if ($user->role_id !== 1 && !is_null($user->limit)) { // not admin
@@ -134,12 +181,6 @@ class AgentController extends Controller
         }
 
         $request->validate($rules);
-
-        if($request->password !=null){
-            $request->merge(['password' => Hash::make($request->password)]);
-        }else{
-            $request->request->remove('password');
-        }
 
         if($request->idr_rate != $agent->idr_rate){
             $agent->save_history()->create([
@@ -182,12 +223,19 @@ class AgentController extends Controller
             $difference = $agent->idr_limit - $request->idr_limit;
             $this->updateDownlines($agent->downlines, 'idr_limit', $difference);
         }
-        $agent->update($request->all());
+        // Only these fields may be changed: never username, point, role_id or upline.
+        $data = $request->only(['name', 'is_active', 'idr_rate', 'processing_fees', 'limit', 'idr_limit']);
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+        $agent->update($data);
         return redirect()->route('agent.index')->withSuccess('Data updated');
     }
 
     public function destroy(User $agent)
     {
+        abort_unless($agent->isAgent(), 404);
+
         $agent->delete();
 
         return redirect()->route('agent.index')->withSuccess('Data deleted');
@@ -219,6 +267,7 @@ class AgentController extends Controller
         ]);
 
         $loginUser = Auth::user();
+        abort_unless($loginUser->canManage($agent), 403);
 
         // Check if agent has enough points before starting transaction
         if ($loginUser->role_id == 3 && $loginUser->point < $request->point) {
@@ -280,6 +329,7 @@ class AgentController extends Controller
         ]);
 
         $loginUser = Auth::user();
+        abort_unless($loginUser->canManage($agent), 403);
 
         try {
             DB::transaction(function () use ($agent, $request, $loginUser) {

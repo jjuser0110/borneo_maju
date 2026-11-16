@@ -197,7 +197,7 @@
                                             if(confirm('{{ __('sidebar.confirm_delete') }}'))
                                             {
                                                 showLoading();
-                                                window.location.href='{{ route('bank_setting.destroy_stock', $stock) }}'
+                                                postTo('{{ route('bank_setting.destroy_stock', $stock) }}')
                                             }
                                         "
                                     >

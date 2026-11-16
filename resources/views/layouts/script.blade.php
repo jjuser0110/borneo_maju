@@ -43,6 +43,20 @@
         document.getElementById('loading-screen').classList.add('d-none');
     }
 
+    // Submit a POST (with CSRF token) instead of following a GET link — used for delete actions.
+    function postTo(url){
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = url;
+        var token = document.createElement('input');
+        token.type = 'hidden';
+        token.name = '_token';
+        token.value = '{{ csrf_token() }}';
+        form.appendChild(token);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
     window.addEventListener("pageshow", function (event) {
         hideLoading();
     });

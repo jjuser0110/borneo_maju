@@ -12,17 +12,21 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
     
+    /** File types users may upload (receipts). Checked against the real file content, not the name. */
+    public const ALLOWED_UPLOAD_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'];
+
     public function upload($file, $module, $moduleId){
 	    if (!empty($file)) {
-            $filenameWithExt = $file->getClientOriginalName();
+            // Extension is taken from the detected MIME type, never from the user's filename,
+            // so "shell.php" or "photo.jpg.php" can't end up as a runnable file.
+            $extension = strtolower((string) $file->guessExtension());
+            if (!in_array($extension, self::ALLOWED_UPLOAD_EXTENSIONS, true)) {
+                abort(422, 'Only image or PDF files can be uploaded.');
+            }
 
-            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            $fileNameToStore = \Illuminate\Support\Str::random(40).'.'.$extension;
 
-            $extension = $file->getClientOriginalExtension();
-
-            $fileNameToStore = $filename.'_'.time().'.'.$extension;
-
-            $latest_filename = $moduleId."/".$fileNameToStore;
+            $latest_filename = (int) $moduleId."/".$fileNameToStore;
 
             $path = $file->storeAs($module,$latest_filename,'public');
 

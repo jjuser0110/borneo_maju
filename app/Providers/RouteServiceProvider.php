@@ -51,9 +51,11 @@ class RouteServiceProvider extends ServiceProvider
             'namespace' => $this->namespace
         ], function ($router) {
             $iterator = new Iterator(new DirectoryIterator(base_path('routes')), Iterator::SELF_FIRST);
+            // These are loaded elsewhere (or are not HTTP routes) — never pull them into the web group.
+            $skip = ['web.php', 'api.php', 'channels.php', 'console.php'];
             foreach ($iterator as $file) {
-                if ($file->isFile()) {
-                    require_once $file->getPathname();
+                if ($file->isFile() && $file->getExtension() === 'php' && !in_array($file->getFilename(), $skip, true)) {
+                    require $file->getPathname();
                 }
             }
         });
