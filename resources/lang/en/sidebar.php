@@ -183,6 +183,7 @@ return [
     'amount_received' => 'Amount Received',
     'print' => 'Print',
     'all_agents' => 'All Agents',
+    'all_orders' => 'All Orders',
     'order_remarks'=> 'Order Remarks',
     'cost' => 'Cost',
     'cost_listing' => 'Cost Listing',

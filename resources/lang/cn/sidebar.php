@@ -183,6 +183,7 @@ return [
     'amount_received' => '收到金额',
     'print' => '打印',
     'all_agents' => '所有代理',
+    'all_orders' => '所有订单',
     'order_remarks' => '订单备注',
     'cost' => '成本',
     'cost_listing' => '成本列表',

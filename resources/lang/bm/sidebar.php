@@ -183,6 +183,7 @@ return [
     'amount_received' => 'Jumlah Terima',
     'print' => 'Cetak',
     'all_agents' => 'Semua Ejen',
+    'all_orders' => 'Semua Pesanan',
     'order_remarks' => 'Catatan Pesanan',
     'cost' => 'Kos',
     'cost_listing' => 'Senarai Kos',

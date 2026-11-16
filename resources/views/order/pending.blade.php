@@ -1,17 +1,6 @@
 @extends('layouts.app')
 @section('content')
 <style>
-.prefix-filter {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 0 24px 16px;
-}
-
-.prefix-filter .btn .badge {
-    margin-left: 4px;
-}
-
 .bank-summary-section {
     padding: 24px;
     border-top: 1px solid #e7e7e8;
@@ -128,23 +117,23 @@
                 <div class="head-label">
                     <h5 class="card-title mb-0">{{ __('sidebar.pending_order_listing') }}</h5>
                 </div>
+
+                <div class="col-md-6 col-12 mb-4">
+                    <form method="GET" action="{{ route('order.pending') }}" onsubmit="showLoading()">
+                        <div class="input-group">
+                            <select name="prefix" class="form-select">
+                                <option value="all">{{ __('sidebar.all_orders') }} ({{ $prefixCounts['all'] }})</option>
+                                @foreach($prefixes as $p)
+                                    <option value="{{ $p }}" {{ $prefix === $p ? 'selected' : '' }}>{{ $p }} ({{ $prefixCounts[$p] }})</option>
+                                @endforeach
+                            </select>
+                            <button class="btn btn-primary" type="submit">{{ __('sidebar.filter') }}</button>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 </div>
-            </div>
-
-            <div class="prefix-filter">
-                <a href="{{ route('order.pending', ['prefix' => 'all']) }}"
-                   class="btn btn-sm {{ $prefix ? 'btn-outline-primary' : 'btn-primary' }}"
-                   onclick="showLoading()">
-                    All <span class="badge bg-white text-primary">{{ $prefixCounts['all'] }}</span>
-                </a>
-                @foreach($prefixes as $p)
-                    <a href="{{ route('order.pending', ['prefix' => $p]) }}"
-                       class="btn btn-sm {{ $prefix === $p ? 'btn-primary' : 'btn-outline-primary' }}"
-                       onclick="showLoading()">
-                        {{ $p }} <span class="badge bg-white text-primary">{{ $prefixCounts[$p] }}</span>
-                    </a>
-                @endforeach
             </div>
 
             <div class="card-datatable text-nowrap">
